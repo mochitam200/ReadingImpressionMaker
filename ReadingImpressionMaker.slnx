@@ -1,0 +1,7 @@
+<Solution>
+  <Configurations>
+    <Platform Name="x64" />
+    <Platform Name="x86" />
+  </Configurations>
+  <Project Path="ReadingImpressionMaker.vcxproj" Id="0a5a8157-b1b8-4114-9b24-9ff0669e3114" />
+</Solution>
