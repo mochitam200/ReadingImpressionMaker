@@ -56,6 +56,59 @@ public:
 	ReadingRecord() = default;
 
 	// 入力された日付の形式（YYMMDD, YYMM, YY+季節）が正しいか判定する関数
+	static bool isValidDate(const std::string& d) {
+		if (d.empty()) return false; // 空文字は不合格とする
+		
+		// パターン1: YYMMDD 形式（数字6桁）
+		if (d.length() == 6 && std::all_of(d.begin(), d.end(), ::isdigit)) { // isdigit…その文字が数字（0〜9）かどうかを判定する関数
+			int month = std::stoi(d.substr(2,2));     // 3〜4文字目（月）を数値に変換、substr（サブストリング）…文字列の中から指定した一部分を切り出す
+			int day = std::stoi(d.substr(4,2));       // 5〜6文字目（日）を数値に変換
+			return (month >= 1 && month <= 12 && day >= 1 && day <= 31);  // 月と日の範囲を検証
+		}
+
+		// パターン2: YYMM 形式（数字4桁）
+		if (d.length() == 4 && std::all_of(d.begin(), d.end(), ::isdigit)) {
+			int month = std::stoi(d.substr(2, 2));    // 3〜4文字目（月）を数値に変換
+			return(month >= 1 && month <= 12);        // 月の範囲を検証
+		}
+
+		// パターン3: YY+季節 形式（数字2桁 + 春/夏/秋/冬）
+		if (d.length() == 5 && std::isdigit(d[0]) && isdigit(d[1])) {
+			std::string season = d.substr(2);  // 3文字目以降（季節の文字列）を切り出し
+			return(season == "春" || season == "夏" || season == "秋" || season == "冬"); // 月の範囲を検証
+		}
+
+		return false; // どの形式にも一致しない場合は不正とする
+	}
+
+	// タイトルや著者名の文字数（1〜50文字）および「スペースのみでないか」を検証する関数
+	// isValidStringLength…文字列の長さが指定した範囲内にあるかを調べるための判定用関数
+	static bool isValidStringLength(const std::string& str) { // 文字列 str の長さが正しいかを判定
+		if (str.empty())return false;  // 空文字は不合格
+
+		// 入力された文字列が「すべて空白文字（スペースやタブなど）」でないか確認
+		bool allWhitespace = std::all_of(str.begin(), str.end(), [](unsigned char c) { // unsigned…「符号なし」のデータ型を指定
+			return std::isspace(c);
+		});
+		if (allWhitespace)return false;  // スペースだけの場合は不合格
+
+		// UTF-8エンコーディングにおける実際の「文字数」をカウント（日本語の全角対応）
+		size_t charCount = 0;
+		for (size_t i = 0;i < str.length();) {
+			unsigned char c = static_cast<unsigned char>(str[i]);  // str の i 番目の文字を unsigned char 型に変換して、c に入れている
+			if (c < 0x80)i += 1;                  // 1バイト文字（半角英数字など）,0x80 は16進数,10進数で128
+			else if ((c & 0xE0) == 0xC0) i += 2;  // 2バイト文字
+			else if ((c & 0xF0) == 0xE0) i += 3;  // 3バイト文字（一般的な日本語）
+			else if ((c & 0xF8) == 0xF0) i += 4;  // 4バイト文字（絵文字など）
+			else i += 1;         // 上記の文字以外
+			charCount++; // 1文字としてカウントします。
+		}
+		return (charCount >= 1 && charCount <= 50); // 1文字以上50文字以内かチェック
+	}
+
+	// 読了日を設定（形式チェックを行い、成功したかどうかをboolで返す）
+
+
 
 
 
