@@ -46,9 +46,9 @@ class ReadingRecord {
 private:
 	std::string date_;         // 読了日を保存する変数
 	std::string title_;        // 書籍タイトルを保存する変数
-	std::string author;        // 著者名を保存する変数
+	std::string author_;        // 著者名を保存する変数
 	int genreIndex_ = -1;           // ジャンルの選択番号（0始まり） 初期値は未選択(-1)
-	std::string genleName_;    // ジャンル名を保存する変数
+	std::string genreName_;    // ジャンル名を保存する変数
 	std::vector<std::string> answers_;    // 各質問に対する回答を保存する配列
 
 public:
@@ -107,12 +107,73 @@ public:
 	}
 
 	// 読了日を設定（形式チェックを行い、成功したかどうかをboolで返す）
+	bool setDate(const std::string& date) { // setDate という名前の関数を定義,引数として日付を文字列で受け取り、処理が成功したかどうかをtrue/falseで返す
+		if(isValidDate(date)){ // 形式チェック
+			date_ = date;   // 日付が正しい場合、受け取った日付をクラスのメンバ変数 date_ に保存
+			return true;    // 日付のチェックに成功して、date_ に保存できたので成功の意味でtrueを返す
+		}
+		return false;       // isValidDate(date) が false だった場合はこちらに来る
+	}
 
+	// 読了日を取得
+	std::string getDate() const { return date_; }
 
+	// タイトルを設定（検証を行い、成功したかどうかをboolで返す）
+	bool setTitle(const std::string& title) { // setTitle という名前の関数を定義,引数としてタイトルを文字列で受け取り、処理が成功したかどうかをtrue/falseで返す
+		if (isValidStringLength(title)) { // 文字数・内容チェック
+			title_ = title; // 文字数と内容が正しければ受け取ったタイトルをメンバ変数 title_ に保存
+			return true; // チェックに成功し title_ に保存できたので成功の意味でtrueを返す
+		}
+		return false; // isValidStringLength が false だった場合はこちらにくる
+	}
 
+	// タイトルを取得
+	std::string getTitle() const { return title_; }
 
+	// 著者名を設定(検証を行い、成功したかどうかをboolで返す)
+	bool setAuthor(const std::string& author) { 
+		if (isValidStringLength(author)) { // 文字数・内容チェック
+			author_ = author; // 文字数と内容が正しければ受け取ったタイトルをメンバ変数 author_ に保存
+			return true;
+		}
+		return false; // isValidStringLength が false だった場合はこちらにくる
+	}
 
+	// 著者名を取得
+	std::string getAuthor() const { return author_; }
 
+	// ジャンル番号（インデックス）とジャンル名を設定
+	void setGenre(int index, const std::string& name) {	// setGenreという名前の関数,ジャンル番号とジャンル名を引数として受け取る(voidなので値は返さない)
+		genreIndex_ = index; // 受け取ったジャンル番号を、メンバ変数 genreIndex_ に保存
+		genreName_ = name;   // 受け取ったジャンル名を、メンバ変数 genreName_ に保存
+	}
+
+	// ジャンルの選択番号を取得
+	int getGenreIndex() const { return genreIndex_; }
+
+	// ジャンル名を取得
+	std::string getGenreName() const { return genreName_; }
+
+	// 回答のリストをまとめて設定
+	void setAnswers(const std::vector<std::string>& answers) {
+		answers_ = answers;		 // 受け取った回答リストを、メンバ変数 answers_ に保存
+	}
+
+	// 回答のリストをすべて取得
+	std::vector<std::string> getAnswers() const { return answers_; }
+
+	// 特定の質問（インデックス指定）の回答だけを差し替え
+	void setAnswer(size_t index, const std::string& answer) { // size_t index…何番目の回答に設定するか,const std::string& answer…設定したい回答文を受け取り
+		if (index < answers_.size()) { // 指定されたインデックスが answers_ の範囲内か確認
+			answers_[index] = answer; // 実際に回答を設定
+		}
+	}
+
+	// 特定の質問の回答を取得
+	std::string getAnswer(size_t index) const { // 「何番目の回答を取得するか」を受け取る
+		if (index < answers_.size())return answers_[index];  // 指定された index が、回答の範囲内にあるか
+		return ""; // もし存在しない番号を指定した場合は、空文字列を返す
+	} 
 };
 
 
