@@ -150,6 +150,7 @@
     <None Include="book_review_questions.csv" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="include\ConsoleUI.hpp" />
     <ClInclude Include="include\CsvLoader.hpp" />
     <ClInclude Include="include\Question.hpp" />
   </ItemGroup>
