@@ -1,4 +1,4 @@
-#include "ConsoleUI.hpp" // テスト対象のConsoleUIを使うために読み込みます。
+﻿#include "../../include/ConsoleUI.hpp" // テスト対象のConsoleUIを使うために読み込みます。
 #include <iostream> // std::cinとテスト結果表示に使います。
 #include <sstream> // テスト用の入力ストリームを作るために使います。
 #include <string> // 文字列を扱うために使います。

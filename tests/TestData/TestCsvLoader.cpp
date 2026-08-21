@@ -1,4 +1,4 @@
-#include "CsvLoader.hpp" // テスト対象のCsvLoaderを使うために読み込みます。
+﻿#include "../../include/CsvLoader.hpp" // テスト対象のCsvLoaderを使うために読み込みます。
 #include <cstdio> // テスト用CSVファイルを削除するstd::removeを使います。
 #include <fstream> // テスト用CSVファイルを作成するために使います。
 #include <iostream> // テスト結果を表示するために使います。

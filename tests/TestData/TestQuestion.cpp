@@ -1,4 +1,4 @@
-#include "Question.hpp" // テスト対象のQuestionSetとReadingRecordを使うために読み込みます。
+﻿#include "../../include/Question.hpp" // テスト対象のQuestionSetとReadingRecordを使うために読み込みます。
 #include <iostream> // テスト結果を画面へ表示するために使います。
 #include <string> // 文字列を扱うために使います。
 #include <vector> // 質問と回答の配列を扱うために使います.

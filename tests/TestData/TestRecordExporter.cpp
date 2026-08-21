@@ -1,4 +1,4 @@
-#include "RecordExporter.hpp" // テスト対象のRecordExporterを使うために読み込みます。
+﻿#include "../../include/RecordExporter.hpp" // テスト対象のRecordExporterを使うために読み込みます。
 #include <filesystem> // outputフォルダとファイルの存在を確認するために使います。
 #include <fstream> // 出力ファイルを読み込むために使います。
 #include <iostream> // テスト結果を表示するために使います。

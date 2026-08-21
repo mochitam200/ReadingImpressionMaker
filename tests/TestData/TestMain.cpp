@@ -1,4 +1,4 @@
-#include <iostream> // コンソールへテスト結果を表示するために使います。
+﻿#include <iostream> // コンソールへテスト結果を表示するために使います。
 
 int runQuestionTests(); // QuestionSetとReadingRecordのテストを実行する関数を宣言します。
 int runCsvLoaderTests(); // CsvLoaderのテストを実行する関数を宣言します。
