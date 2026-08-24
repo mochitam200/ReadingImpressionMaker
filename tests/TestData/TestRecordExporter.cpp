@@ -23,19 +23,19 @@ bool check(bool condition, const std::string& name) // テスト結果を共通�
 } // check関数の終了です。
 
 ReadingRecord createTestRecord() // RecordExporterで使うテスト用ReadingRecordを作ります。
-{ // 関数開始です。
-    ReadingRecord record; // 空のReadingRecordを作ります。
-    record.setDate("260801"); // 読了日を設定します。
-    record.setTitle("人間失格"); // タイトルを設定します。
-    record.setAuthor("太宰治"); // 著者を設定します。
-    record.setGenre(0, "小説・物語"); // ジャンルを設定します。
-    record.setAnswers({"主人公の葉蔵。", "冒頭の一文。", "(スキップ)", "もう会わなくていいと言いたい。"}); // 4問分の回答を設定します。
-    return record; // 完成したテスト用レコードを返します。
+{
+    ReadingRecord record;
+    record.setDate("260801");
+    record.setTitle("人間失格");
+    record.setAuthor("太宰治");
+    record.setGenre(0, "小説・物語");
+    record.setAnswers({ "一言紹介。", "主人公の葉蔵。", "冒頭の一文。", "(スキップ)", "もう会わなくていいと言いたい。", "定期的に読み返したい。" });
+    return record;// 完成したテスト用レコードを返します。
 } // 関数終了です。
 
 std::vector<QuestionSet> createTestQuestions() // 出力テスト用の質問セットを作ります。
 { // 関数開始です。
-    return {QuestionSet("小説・物語", {"質問1", "質問2", "質問3", "質問4"})}; // 1ジャンル4問の質問セットを返します。
+    return { QuestionSet("小説・物語", {"質問1", "質問2", "質問3", "質問4", "質問5", "質問6"}) }; // 1ジャンル6問の質問セットを返します。
 } // 関数終了です。
 
 fs::path expectedFile() // 通常時に作られるファイルパスを返します。

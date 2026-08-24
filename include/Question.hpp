@@ -58,6 +58,9 @@ public:
 	// 入力された日付の形式（YYMMDD, YYMM, YY+季節）が正しいか判定する関数
 	static bool isValidDate(const std::string& d) {
 		if (d.empty()) return false; // 空文字は不合格とする
+
+		// パターン4: 不明（読了時期不明）
+		if (d == "不明") return true;
 		
 		// パターン1: YYMMDD 形式（数字6桁）
 		if (d.length() == 6 && std::all_of(d.begin(), d.end(), ::isdigit)) { // isdigit…その文字が数字（0〜9）かどうかを判定する関数

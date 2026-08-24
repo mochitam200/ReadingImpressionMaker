@@ -62,8 +62,8 @@ public:
 			lines.pop_back(); // リストの一番後ろの要素を削除
 		}
 
-		// 仕様により、データが20行未満の場合はエラー（空の配列を返す）と判定
-		if (lines.size() < 20) return result;
+		// 仕様により、データが30行未満の場合はエラー（空の配列を返す）と判定
+		if (lines.size() < 30) return result;
 
 		// ジャンルごとに「ジャンル名」と「質問番号 -> 質問文」を一時保存する構造体
 		struct GenreData {

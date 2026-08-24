@@ -36,14 +36,16 @@ bool check(bool condition, const std::string& name) // テスト結果を共通�
     return false; // 失敗を返します。
 } // check関数の終了です。
 
+
+
 std::vector<QuestionSet> createTestQuestionSets() // 5ジャンル分のテストデータを作ります。
-{ // 関数開始です。
-    return { // 作成したQuestionSet一覧をそのまま返します。
-        QuestionSet("小説・物語", {"質問1", "質問2", "質問3", "質問4"}), // 1番目のジャンルを作ります。
-        QuestionSet("実用書", {"質問1", "質問2", "質問3", "質問4"}), // 2番目のジャンルを作ります。
-        QuestionSet("ビジネス・自己啓発", {"質問1", "質問2", "質問3", "質問4"}), // 3番目のジャンルを作ります。
-        QuestionSet("専門書・学習書", {"質問1", "質問2", "質問3", "質問4"}), // 4番目のジャンルを作ります。
-        QuestionSet("ノンフィクション・伝記", {"質問1", "質問2", "質問3", "質問4"}) // 5番目のジャンルを作ります。
+{
+    return {
+        QuestionSet("小説・物語", {"質問1", "質問2", "質問3", "質問4", "質問5", "質問6"}),
+        QuestionSet("実用書", {"質問1", "質問2", "質問3", "質問4", "質問5", "質問6"}),
+        QuestionSet("ビジネス・自己啓発", {"質問1", "質問2", "質問3", "質問4", "質問5", "質問6"}),
+        QuestionSet("専門書・学習書", {"質問1", "質問2", "質問3", "質問4", "質問5", "質問6"}),
+        QuestionSet("ノンフィクション・伝記", {"質問1", "質問2", "質問3", "質問4", "質問5", "質問6"})
     }; // 初期化したvectorを返します。
 } // 関数終了です。
 
@@ -58,6 +60,13 @@ std::string makeString51() // ASCII文字51文字のテストデータを作り�
 } // 関数終了です。
 
 } // 無名名前空間の終了です。
+
+bool testInputDateUnknown() // 読了日「不明」をテストします。
+{
+    CinRedirect input("不明\n");
+    const std::string result = ConsoleUI::inputDate();
+    return check(result == "不明", "inputDate 不明");
+}
 
 bool testInputDateValidMin() // YYMMDD形式の最小値260101をテストします。
 { // テスト開始です。
@@ -231,30 +240,30 @@ bool testSelectGenreCancelThenSelect() // nでジャンル選択を取り消し�
 } // テスト終了です。
 
 bool testAskQuestionsOneLine() // 1行回答をテストします。
-{ // テスト開始です。
-    const QuestionSet questionSet("小説・物語", {"質問1", "質問2", "質問3", "質問4"}); // 4問の質問セットを作ります。
-    CinRedirect input("回答1\n\n回答2\n\n回答3\n\n回答4\n\n"); // 4問それぞれに1行回答を入力します。
-    const auto answers = ConsoleUI::askQuestions(questionSet); // 回答収集処理を実行します。
-    return check(answers.size() == 4 && answers[0] == "回答1" && answers[1] == "回答2" && answers[2] == "回答3" && answers[3] == "回答4", "askQuestions one line"); // 4つの回答が正しく保存されたか確認します。
-} // テスト終了です。
+{
+    const QuestionSet questionSet("小説・物語", { "質問1", "質問2", "質問3", "質問4", "質問5", "質問6" });
+    CinRedirect input("回答1\n\n回答2\n\n回答3\n\n回答4\n\n回答5\n\n回答6\n\n");
+    const auto answers = ConsoleUI::askQuestions(questionSet);
+    return check(answers.size() == 6 && answers[0] == "回答1" && answers[5] == "回答6", "askQuestions one line");
+}
 
 bool testAskQuestionsSkip() // skipを入力するとスキップになるかテストします。
-{ // テスト開始です。
-    const QuestionSet questionSet("小説・物語", {"質問1", "質問2", "質問3", "質問4"}); // 4問の質問セットを作ります。
-    CinRedirect input("skip\nskip\nskip\nskip\n"); // 4問すべてにskipを入力します。
-    const auto answers = ConsoleUI::askQuestions(questionSet); // 回答収集処理を実行します。
-    return check(answers.size() == 4 && answers[0] == "(スキップ)" && answers[1] == "(スキップ)" && answers[2] == "(スキップ)" && answers[3] == "(スキップ)", "askQuestions all skip"); // 全問がスキップとして保存されたか確認します。
-} // テスト終了です。
+{
+    const QuestionSet questionSet("小説・物語", { "質問1", "質問2", "質問3", "質問4", "質問5", "質問6" });
+    CinRedirect input("skip\nskip\nskip\nskip\nskip\nskip\n");
+    const auto answers = ConsoleUI::askQuestions(questionSet);
+    return check(answers.size() == 6 && answers[0] == "(スキップ)" && answers[5] == "(スキップ)", "askQuestions all skip");
+}
 
 bool testAskQuestionsSkipWordIsNotPartialMatch() // skipperなどをskipと誤認しないかテストします。
-{ // テスト開始です。
-    const QuestionSet questionSet("小説・物語", {"質問1", "質問2", "質問3", "質問4"}); // 4問の質問セットを作ります。
-    CinRedirect input("skipper\n\nskipです\n\n通常回答\n\nskip\n"); // skipを含む別の文字列とskip本体を混ぜて入力します。
-    const auto answers = ConsoleUI::askQuestions(questionSet); // 回答収集処理を実行します。
-    const bool first = answers.size() >= 1 && answers[0] == "skipper"; // skipperが通常回答として扱われたか確認します。
-    const bool second = answers.size() >= 2 && answers[1] == "skipです"; // skipですが通常回答として扱われたか確認します。
-    const bool fourth = answers.size() >= 4 && answers[3] == "(スキップ)"; // 4問目のskipだけがスキップになったか確認します。
-    return check(first && second && fourth, "askQuestions skip partial match"); // 判定結果をまとめて確認します。
+{
+    const QuestionSet questionSet("小説・物語", { "質問1", "質問2", "質問3", "質問4", "質問5", "質問6" });
+    CinRedirect input("skipper\n\nskipです\n\n通常回答\n\nskip\n\n回答5\n\n回答6\n\n");
+    const auto answers = ConsoleUI::askQuestions(questionSet);
+    const bool first = answers.size() >= 1 && answers[0] == "skipper";
+    const bool second = answers.size() >= 2 && answers[1] == "skipです";
+    const bool fourth = answers.size() >= 4 && answers[3] == "(スキップ)";
+    return check(first && second && fourth, "askQuestions skip partial match");
 } // テスト終了です。
 
 int runConsoleUITests() // ConsoleUIの全テストを実行します。
