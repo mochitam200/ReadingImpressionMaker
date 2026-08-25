@@ -141,10 +141,9 @@
     </Manifest>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="main.cpp" />
+    <ClCompile Include="src\main.cpp" />
     <ClCompile Include="tests\TestData\TestConsoleUI.cpp" />
     <ClCompile Include="tests\TestData\TestCsvLoader.cpp" />
-    <ClCompile Include="tests\TestData\TestMain.cpp" />
     <ClCompile Include="tests\TestData\TestQuestion.cpp" />
     <ClCompile Include="tests\TestData\TestRecordExporter.cpp" />
   </ItemGroup>
