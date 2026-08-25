@@ -7,6 +7,7 @@
 #include <fstream>      // ファイル書き込み（std::ofstream）を行うために読み込み
 #include <string>       // 文字列を扱うために読み込み
 #include <vector>       // 配列を扱うために読み込み
+#include <clocale>   // ロケール設定のため
 
 namespace fs = std::filesystem; // std::filesystem を fs という短い名前で使えるようする
 
@@ -29,6 +30,9 @@ public:
     // 読書記録と質問セットを受け取り、指定されたフォーマットでテキストファイルを出力
     static bool exportToFile(const ReadingRecord& record, const std::vector<QuestionSet>& questions) {
         try {
+
+            std::setlocale(LC_ALL, ".UTF-8"); // UTF-8パスおよびファイル名の文字コード変換エラーを防止
+
             // 保存先となる "output" フォルダが存在しない場合、自動的に作成
             if (!fs::exists("output")) {
                 fs::create_directories("output");

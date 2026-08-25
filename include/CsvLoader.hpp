@@ -38,8 +38,8 @@ public:
 			
 		// 改行コード（LF または CRLF）に対応しながら、1行ずつの配列へ分割
 		std::vector<std::string> lines;
-		std::string currentLine;
-		for (size_t i = 0;i < content.size();i++) {
+		std::string currentLine;	
+		for (size_t i = 0; i < content.size(); i++) {
 			char c = content[i];
 			if (c == '\r') {
 				// Windows形式（\r\n）の場合、次の \n も一緒にスキップ
@@ -47,12 +47,17 @@ public:
 					i++;
 				}
 				lines.push_back(currentLine); // 1行分として登録
-				currentLine.clear();// currentLine の中身を消去する
+				currentLine.clear(); // currentLine の中身を消去する
+			}
+			else if (c == '\n') { // LF単体の改行にも対応
+				lines.push_back(currentLine);
+				currentLine.clear();
 			}
 			else {
 				currentLine.push_back(c); // 通常の文字は現在の行に追加
 			}
 		}
+
 		if (!currentLine.empty()) { // 最終行が空行（不要な末尾の空行など）でない場合のみ
 			lines.push_back(currentLine); // ファイル末尾の最終行を追加
 		}
