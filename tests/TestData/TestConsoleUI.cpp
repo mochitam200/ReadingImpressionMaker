@@ -3,298 +3,360 @@
 #include <sstream> // テスト用の入力ストリームを作るために使います。
 #include <string> // 文字列を扱うために使います。
 #include <vector> // QuestionSetの一覧を作るために使います。
+#include <algorithm> // 判定用アルゴリズムを使います。
+#include <cctype> // 数字判定に使います。
 
 class CinRedirect // std::cinを一時的にテスト用文字列へ差し替えるクラスです。
-{ // クラスの開始です。
-private: // 以下をクラス内部だけで使えるようにします。
-    std::streambuf* originalBuffer_; // 差し替える前のstd::cinの入力バッファを保存します。
-    std::istringstream inputStream_; // テストで入力する文字列をストリームとして保持します。
+{
+private:
+    std::streambuf* originalBuffer_;
+    std::istringstream inputStream_;
 
-public: // 以下を外部から利用できるようにします。
-    explicit CinRedirect(const std::string& input) : originalBuffer_(std::cin.rdbuf()), inputStream_(input) // テスト入力を設定し、元の入力先を保存します。
-    { // コンストラクタの開始です。
-        std::cin.rdbuf(inputStream_.rdbuf()); // std::cinをテスト用ストリームへ変更します。
-    } // コンストラクタの終了です。
+public:
+    explicit CinRedirect(const std::string& input) : originalBuffer_(std::cin.rdbuf()), inputStream_(input)
+    {
+        std::cin.rdbuf(inputStream_.rdbuf());
+    }
 
-    ~CinRedirect() // テスト終了時に呼ばれるデストラクタです。
-    { // デストラクタの開始です。
-        std::cin.rdbuf(originalBuffer_); // std::cinを元の入力先へ戻します。
-    } // デストラクタの終了です。
+    ~CinRedirect()
+    {
+        std::cin.rdbuf(originalBuffer_);
+    }
 };
 
-namespace // このファイルだけで使う補助関数を名前空間で囲みます。
-{ // 無名名前空間の開始です。
-
-bool check(bool condition, const std::string& name) // テスト結果を共通表示する関数です。
-{ // check関数の開始です。
-    if (condition) // 期待した結果になったか確認します。
-    { // 成功時の開始です。
-        std::cout << "[PASS] " << name << '\n'; // 成功したテスト名を表示します。
-        return true; // 成功を返します。
-    } // 成功時の終了です。
-    std::cout << "[FAIL] " << name << '\n'; // 失敗したテスト名を表示します。
-    return false; // 失敗を返します。
-} // check関数の終了です。
-
-
-
-std::vector<QuestionSet> createTestQuestionSets() // 5ジャンル分のテストデータを作ります。
+namespace
 {
-    return {
-        QuestionSet("小説・物語", {"質問1", "質問2", "質問3", "質問4", "質問5", "質問6"}),
-        QuestionSet("実用書", {"質問1", "質問2", "質問3", "質問4", "質問5", "質問6"}),
-        QuestionSet("ビジネス・自己啓発", {"質問1", "質問2", "質問3", "質問4", "質問5", "質問6"}),
-        QuestionSet("専門書・学習書", {"質問1", "質問2", "質問3", "質問4", "質問5", "質問6"}),
-        QuestionSet("ノンフィクション・伝記", {"質問1", "質問2", "質問3", "質問4", "質問5", "質問6"})
-    }; // 初期化したvectorを返します。
-} // 関数終了です。
 
-std::string makeString50() // ASCII文字50文字のテストデータを作ります。
-{ // 関数開始です。
-    return std::string(50, 'A'); // Aを50個並べて返します。
-} // 関数終了です。
+    bool check(bool condition, const std::string& name)
+    {
+        if (condition)
+        {
+            std::cout << "[PASS] " << name << '\n';
+            return true;
+        }
+        std::cout << "[FAIL] " << name << '\n';
+        return false;
+    }
 
-std::string makeString51() // ASCII文字51文字のテストデータを作ります。
-{ // 関数開始です。
-    return std::string(51, 'A'); // Aを51個並べて返します。
-} // 関数終了です。
+    std::vector<QuestionSet> createTestQuestionSets()
+    {
+        return {
+            QuestionSet("小説・物語", "ストーリーや登場人物の心情を楽しむ本", {"質問1", "質問2", "質問3", "質問4", "質問5", "質問6"}),
+            QuestionSet("実用書", "日常生活ですぐ使えるノウハウを提供する本", {"質問1", "質問2", "質問3", "質問4", "質問5", "質問6"}),
+            QuestionSet("ビジネス・自己啓発", "ビジネススキルや自己成長を直接扱う本", {"質問1", "質問2", "質問3", "質問4", "質問5", "質問6"}),
+            QuestionSet("専門書・学習書", "特定の分野について専門的・学術的に深く追求するための本", {"質問1", "質問2", "質問3", "質問4", "質問5", "質問6"}),
+            QuestionSet("ノンフィクション・伝記", "事実に基づいた記録や人物の生涯を描いた本", {"質問1", "質問2", "質問3", "質問4", "質問5", "質問6"})
+        };
+    }
 
-} // 無名名前空間の終了です。
+    std::string makeString50()
+    {
+        return std::string(50, 'A');
+    }
 
-bool testInputDateUnknown() // 読了日「不明」をテストします。
+    std::string makeString51()
+    {
+        return std::string(51, 'A');
+    }
+
+} // 無名名前空間
+
+// TC-U-01: 読了日「不明」入力
+bool testInputDateUnknown()
 {
     CinRedirect input("不明\n");
     const std::string result = ConsoleUI::inputDate();
-    return check(result == "不明", "inputDate 不明");
+    return check(result == "不明", "TC-U-01: inputDate 不明");
 }
 
-bool testInputDateValidMin() // YYMMDD形式の最小値260101をテストします。
-{ // テスト開始です。
-    CinRedirect input("260101\n"); // 260101を入力した状態を作ります。
-    const std::string result = ConsoleUI::inputDate(); // 読了日入力処理を実行します。
-    return check(result == "260101", "inputDate 260101"); // 入力値がそのまま受理されたか確認します。
-} // テスト終了です。
-
-bool testInputDateValidMax() // YYMMDD形式の最大値261231をテストします。
-{ // テスト開始です。
-    CinRedirect input("261231\n"); // 261231を入力した状態を作ります。
-    const std::string result = ConsoleUI::inputDate(); // 読了日入力処理を実行します。
-    return check(result == "261231", "inputDate 261231"); // 入力値が受理されたか確認します。
-} // テスト終了です。
-
-bool testInputDateInvalidMonthAndDay() // 月や日の範囲外を入力した後に再入力できるかテストします。
-{ // テスト開始です。
-    CinRedirect input("260001\n261301\n260832\n260801\n"); // 不正な3種類を入力した後、正しい値を入力します。
-    const std::string result = ConsoleUI::inputDate(); // 読了日入力処理を実行します。
-    return check(result == "260801", "inputDate invalid month/day then valid"); // 最後の正しい値が受理されたか確認します。
-} // テスト終了です。
-
-bool testInputDateValidMonth() // YYMM形式の最小値をテストします。
-{ // テスト開始です。
-    CinRedirect input("2601\n"); // 2601を入力します。
-    const std::string result = ConsoleUI::inputDate(); // 読了日入力処理を実行します。
-    return check(result == "2601", "inputDate 2601"); // 正常に受理されたか確認します。
-} // テスト終了です。
-
-bool testInputDateValidMonthMax() // YYMM形式の最大値をテストします。
-{ // テスト開始です。
-    CinRedirect input("2612\n"); // 2612を入力します。
-    const std::string result = ConsoleUI::inputDate(); // 読了日入力処理を実行します。
-    return check(result == "2612", "inputDate 2612"); // 正常に受理されたか確認します。
-} // テスト終了です。
-
-bool testInputDateInvalidMonthFormat() // YYMM形式の範囲外を拒否できるかテストします。
-{ // テスト開始です。
-    CinRedirect input("2600\n2613\n2601\n"); // 不正な2つを入力してから正常値を入力します。
-    const std::string result = ConsoleUI::inputDate(); // 読了日入力処理を実行します。
-    return check(result == "2601", "inputDate invalid YYMM then valid"); // 正常値が受理されたか確認します。
-} // テスト終了です。
-
-bool testInputDateSeasons() // 4種類の季節表記をそれぞれテストします。
-{ // テスト開始です。
-    bool ok = true; // 全テストが成功したかを保存します。
-    { CinRedirect input("26春\n"); ok = ok && ConsoleUI::inputDate() == "26春"; } // 春の入力が受理されるか確認します。
-    { CinRedirect input("26夏\n"); ok = ok && ConsoleUI::inputDate() == "26夏"; } // 夏の入力が受理されるか確認します。
-    { CinRedirect input("26秋\n"); ok = ok && ConsoleUI::inputDate() == "26秋"; } // 秋の入力が受理されるか確認します。
-    { CinRedirect input("26冬\n"); ok = ok && ConsoleUI::inputDate() == "26冬"; } // 冬の入力が受理されるか確認します。
-    return check(ok, "inputDate four seasons"); // 4つすべて成功したか確認します。
-} // テスト終了です。
-
-bool testInputDateInvalidSeason() // 不正な季節表記を拒否できるかテストします。
-{ // テスト開始です。
-    CinRedirect input("26初夏\n26Spring\n26春\n"); // 不正な2つを入力してから正常な季節を入力します。
-    const std::string result = ConsoleUI::inputDate(); // 読了日入力処理を実行します。
-    return check(result == "26春", "inputDate invalid season then valid"); // 正常な季節だけが受理されたか確認します。
-} // テスト終了です。
-
-bool testInputDateEmpty() // 空入力を拒否して再入力できるかテストします。
-{ // テスト開始です。
-    CinRedirect input("\n260801\n"); // 空入力の後に正常値を入力します。
-    const std::string result = ConsoleUI::inputDate(); // 読了日入力処理を実行します。
-    return check(result == "260801", "inputDate empty then valid"); // 正常値が受理されたか確認します。
-} // テスト終了です。
-
-bool testInputDateDifferentFormat() // 指定されていない日付形式を拒否するかテストします。
-{ // テスト開始です。
-    CinRedirect input("2026/08/01\n260801\n"); // 不正形式の後に正常値を入力します。
-    const std::string result = ConsoleUI::inputDate(); // 読了日入力処理を実行します。
-    return check(result == "260801", "inputDate different format then valid"); // 正常値が受理されたか確認します。
-} // テスト終了です。
-
-bool testInputTitleValid() // 通常のタイトルを入力できるかテストします。
-{ // テスト開始です。
-    CinRedirect input("人間失格\n"); // タイトルを入力します。
-    const std::string result = ConsoleUI::inputTitle(); // タイトル入力処理を実行します。
-    return check(result == "人間失格", "inputTitle normal"); // 入力されたタイトルが返るか確認します。
-} // テスト終了です。
-
-bool testInputTitleQ84() // qを含む1Q84を中断操作と誤認しないかテストします。
-{ // テスト開始です。
-    CinRedirect input("1Q84\n"); // 1Q84を入力します。
-    const std::string result = ConsoleUI::inputTitle(); // タイトル入力処理を実行します。
-    return check(result == "1Q84", "inputTitle 1Q84"); // 1Q84がそのままタイトルになるか確認します。
-} // テスト終了です。
-
-bool testInputTitle50Characters() // タイトル50文字を受理するかテストします。
-{ // テスト開始です。
-    const std::string title = makeString50(); // 50文字のタイトルを作ります。
-    CinRedirect input(title + "\n"); // 50文字タイトルを入力します。
-    const std::string result = ConsoleUI::inputTitle(); // タイトル入力処理を実行します。
-    return check(result == title, "inputTitle 50 characters"); // 上限値が受理されたか確認します。
-} // テスト終了です。
-
-bool testInputTitle51Characters() // タイトル51文字を拒否して再入力できるかテストします。
-{ // テスト開始です。
-    const std::string title51 = makeString51(); // 51文字のタイトルを作ります。
-    CinRedirect input(title51 + "\n人間失格\n"); // 51文字を入力した後に正常値を入力します。
-    const std::string result = ConsoleUI::inputTitle(); // タイトル入力処理を実行します。
-    return check(result == "人間失格", "inputTitle 51 characters then valid"); // 正常値が最終的に受理されたか確認します。
-} // テスト終了です。
-
-bool testInputTitleEmpty() // 空入力を拒否して再入力できるかテストします。
-{ // テスト開始です。
-    CinRedirect input("\n人間失格\n"); // 空入力の後に正常値を入力します。
-    const std::string result = ConsoleUI::inputTitle(); // タイトル入力処理を実行します。
-    return check(result == "人間失格", "inputTitle empty then valid"); // 正常値が受理されたか確認します。
-} // テスト終了です。
-
-bool testInputTitleSpaces() // スペースだけのタイトルを拒否できるかテストします。
-{ // テスト開始です。
-    CinRedirect input("   \n人間失格\n"); // スペースだけを入力した後に正常値を入力します。
-    const std::string result = ConsoleUI::inputTitle(); // タイトル入力処理を実行します。
-    return check(result == "人間失格", "inputTitle spaces then valid"); // 正常値が受理されたか確認します。
-} // テスト終了です。
-
-bool testInputAuthorValid() // 通常の著者名を入力できるかテストします。
-{ // テスト開始です。
-    CinRedirect input("太宰治\n"); // 著者名を入力します。
-    const std::string result = ConsoleUI::inputAuthor(); // 著者入力処理を実行します。
-    return check(result == "太宰治", "inputAuthor normal"); // 入力された著者名が返るか確認します。
-} // テスト終了です。
-
-bool testInputAuthorEmpty() // 空の著者名を拒否できるかテストします。
-{ // テスト開始です。
-    CinRedirect input("\n太宰治\n"); // 空入力の後に正常値を入力します。
-    const std::string result = ConsoleUI::inputAuthor(); // 著者入力処理を実行します。
-    return check(result == "太宰治", "inputAuthor empty then valid"); // 正常値が受理されたか確認します。
-} // テスト終了です。
-
-bool testInputAuthor50Characters() // 著者名50文字を受理するかテストします。
-{ // テスト開始です。
-    const std::string author = makeString50(); // 50文字の著者名を作ります。
-    CinRedirect input(author + "\n"); // 50文字の著者名を入力します。
-    const std::string result = ConsoleUI::inputAuthor(); // 著者入力処理を実行します。
-    return check(result == author, "inputAuthor 50 characters"); // 上限値が受理されたか確認します。
-} // テスト終了です。
-
-bool testSelectGenreFirst() // ジャンル1を選択して確定できるかテストします。
-{ // テスト開始です。
-    const auto questions = createTestQuestionSets(); // 5ジャンルのテストデータを作ります。
-    CinRedirect input("1\ny\n"); // 1番と確定のyを入力します。
-    const int result = ConsoleUI::selectGenre(questions); // ジャンル選択処理を実行します。
-    return check(result == 0, "selectGenre 1"); // 0-indexedの0が返るか確認します。
-} // テスト終了です。
-
-bool testSelectGenreLast() // ジャンル5を選択して確定できるかテストします。
-{ // テスト開始です。
-    const auto questions = createTestQuestionSets(); // 5ジャンルのテストデータを作ります。
-    CinRedirect input("5\ny\n"); // 5番と確定のyを入力します。
-    const int result = ConsoleUI::selectGenre(questions); // ジャンル選択処理を実行します。
-    return check(result == 4, "selectGenre 5"); // 0-indexedの4が返るか確認します。
-} // テスト終了です。
-
-bool testSelectGenreInvalidThenValid() // 範囲外入力後に正常値を入力できるかテストします。
-{ // テスト開始です。
-    const auto questions = createTestQuestionSets(); // 5ジャンルのテストデータを作ります。
-    CinRedirect input("0\n6\na\n\n1\ny\n"); // 0、6、a、空入力の後に1とyを入力します。
-    const int result = ConsoleUI::selectGenre(questions); // ジャンル選択処理を実行します。
-    return check(result == 0, "selectGenre invalid then valid"); // 最終的に1番目が選択されたか確認します。
-} // テスト終了です。
-
-bool testSelectGenreCancelThenSelect() // nでジャンル選択を取り消して再選択できるかテストします。
-{ // テスト開始です。
-    const auto questions = createTestQuestionSets(); // 5ジャンルのテストデータを作ります。
-    CinRedirect input("1\nn\n2\ny\n"); // 1番を選んでnで取り消し、その後2番をyで確定します。
-    const int result = ConsoleUI::selectGenre(questions); // ジャンル選択処理を実行します。
-    return check(result == 1, "selectGenre cancel then select 2"); // 2番目が選択されたか確認します。
-} // テスト終了です。
-
-bool testAskQuestionsOneLine() // 1行回答をテストします。
+// TC-U-02: YYMMDD最小値
+bool testInputDateValidMin()
 {
-    const QuestionSet questionSet("小説・物語", { "質問1", "質問2", "質問3", "質問4", "質問5", "質問6" });
+    CinRedirect input("260101\n");
+    const std::string result = ConsoleUI::inputDate();
+    return check(result == "260101", "TC-U-02: inputDate 260101");
+}
+
+// TC-U-03: YYMMDD最大値
+bool testInputDateValidMax()
+{
+    CinRedirect input("261231\n");
+    const std::string result = ConsoleUI::inputDate();
+    return check(result == "261231", "TC-U-03: inputDate 261231");
+}
+
+// TC-U-04: 月日の範囲外→再入力
+bool testInputDateInvalidMonthAndDay()
+{
+    CinRedirect input("260001\n261301\n260832\n260801\n");
+    const std::string result = ConsoleUI::inputDate();
+    return check(result == "260801", "TC-U-04: inputDate invalid month/day then valid");
+}
+
+// TC-U-05: YYMM形式最小値
+bool testInputDateValidMonth()
+{
+    CinRedirect input("2601\n");
+    const std::string result = ConsoleUI::inputDate();
+    return check(result == "2601", "TC-U-05: inputDate 2601");
+}
+
+// TC-U-06: YYMM形式最大値
+bool testInputDateValidMonthMax()
+{
+    CinRedirect input("2612\n");
+    const std::string result = ConsoleUI::inputDate();
+    return check(result == "2612", "TC-U-06: inputDate 2612");
+}
+
+// TC-U-07: YYMM不正形式→再入力
+bool testInputDateInvalidMonthFormat()
+{
+    CinRedirect input("2600\n2613\n2601\n");
+    const std::string result = ConsoleUI::inputDate();
+    return check(result == "2601", "TC-U-07: inputDate invalid YYMM then valid");
+}
+
+// TC-U-08: 4季節入力（春夏秋冬）
+bool testInputDateSeasons()
+{
+    bool ok = true;
+    { CinRedirect input("26春\n"); ok = ok && ConsoleUI::inputDate() == "26春"; }
+    { CinRedirect input("26夏\n"); ok = ok && ConsoleUI::inputDate() == "26夏"; }
+    { CinRedirect input("26秋\n"); ok = ok && ConsoleUI::inputDate() == "26秋"; }
+    { CinRedirect input("26冬\n"); ok = ok && ConsoleUI::inputDate() == "26冬"; }
+    return check(ok, "TC-U-08: inputDate four seasons");
+}
+
+// TC-U-09: 不正季節表記→再入力
+bool testInputDateInvalidSeason()
+{
+    CinRedirect input("26初夏\n26Spring\n26春\n");
+    const std::string result = ConsoleUI::inputDate();
+    return check(result == "26春", "TC-U-09: inputDate invalid season then valid");
+}
+
+// TC-U-10: 空入力（Enterのみ）自動補完
+bool testInputDateEmptyAuto()
+{
+    CinRedirect input("\n");
+    const std::string result = ConsoleUI::inputDate();
+    const bool validTodayFormat = (result.length() == 6) &&
+        std::all_of(result.begin(), result.end(), ::isdigit) &&
+        (std::stoi(result.substr(2, 2)) >= 1 && std::stoi(result.substr(2, 2)) <= 12) &&
+        (std::stoi(result.substr(4, 2)) >= 1 && std::stoi(result.substr(4, 2)) <= 31);
+    return check(validTodayFormat, "TC-U-10: inputDate empty auto-complete");
+}
+
+// TC-U-11: 未対応フォーマット→再入力
+bool testInputDateDifferentFormat()
+{
+    CinRedirect input("2026/08/01\n260801\n");
+    const std::string result = ConsoleUI::inputDate();
+    return check(result == "260801", "TC-U-11: inputDate different format then valid");
+}
+
+// TC-U-12: 通常のタイトル
+bool testInputTitleValid()
+{
+    CinRedirect input("人間失格\n");
+    const std::string result = ConsoleUI::inputTitle();
+    return check(result == "人間失格", "TC-U-12: inputTitle normal");
+}
+
+// TC-U-13: 中断コマンド誤認知防止
+bool testInputTitleQ84()
+{
+    CinRedirect input("1Q84\n");
+    const std::string result = ConsoleUI::inputTitle();
+    return check(result == "1Q84", "TC-U-13: inputTitle 1Q84");
+}
+
+// TC-U-14: 境界値 50文字タイトル
+bool testInputTitle50Characters()
+{
+    const std::string title = makeString50();
+    CinRedirect input(title + "\n");
+    const std::string result = ConsoleUI::inputTitle();
+    return check(result == title, "TC-U-14: inputTitle 50 characters");
+}
+
+// TC-U-15: 境界値 51文字タイトル→再入力
+bool testInputTitle51Characters()
+{
+    const std::string title51 = makeString51();
+    CinRedirect input(title51 + "\n人間失格\n");
+    const std::string result = ConsoleUI::inputTitle();
+    return check(result == "人間失格", "TC-U-15: inputTitle 51 characters then valid");
+}
+
+// TC-U-16: 空入力（Enterのみ）自動補完
+bool testInputTitleEmptyAuto()
+{
+    CinRedirect input("\n");
+    const std::string result = ConsoleUI::inputTitle();
+    return check(result == "Unknown_title", "TC-U-16: inputTitle empty auto-complete");
+}
+
+// TC-U-17: スペースのみ入力自動補完
+bool testInputTitleSpacesAuto()
+{
+    CinRedirect input("   \n");
+    const std::string result = ConsoleUI::inputTitle();
+    return check(result == "Unknown_title", "TC-U-17: inputTitle spaces auto-complete");
+}
+
+// TC-U-18: 通常の著者名
+bool testInputAuthorValid()
+{
+    CinRedirect input("太宰治\n");
+    const std::string result = ConsoleUI::inputAuthor();
+    return check(result == "太宰治", "TC-U-18: inputAuthor normal");
+}
+
+// TC-U-19: 空入力（Enterのみ）自動補完
+bool testInputAuthorEmptyAuto()
+{
+    CinRedirect input("\n");
+    const std::string result = ConsoleUI::inputAuthor();
+    return check(result == "Unknown_author", "TC-U-19: inputAuthor empty auto-complete");
+}
+
+// TC-U-20: 境界値 50文字著者名
+bool testInputAuthor50Characters()
+{
+    const std::string author = makeString50();
+    CinRedirect input(author + "\n");
+    const std::string result = ConsoleUI::inputAuthor();
+    return check(result == author, "TC-U-20: inputAuthor 50 characters");
+}
+
+// TC-U-21: 境界値 51文字著者名→再入力
+bool testInputAuthor51Characters()
+{
+    const std::string author51 = makeString51();
+    CinRedirect input(author51 + "\n太宰治\n");
+    const std::string result = ConsoleUI::inputAuthor();
+    return check(result == "太宰治", "TC-U-21: inputAuthor 51 characters then valid");
+}
+
+// TC-U-22: ジャンル1を選択・確定
+bool testSelectGenreFirst()
+{
+    const auto questions = createTestQuestionSets();
+    CinRedirect input("1\ny\n");
+    const int result = ConsoleUI::selectGenre(questions);
+    return check(result == 0, "TC-U-22: selectGenre 1");
+}
+
+// TC-U-23: ジャンル5を選択・確定
+bool testSelectGenreLast()
+{
+    const auto questions = createTestQuestionSets();
+    CinRedirect input("5\ny\n");
+    const int result = ConsoleUI::selectGenre(questions);
+    return check(result == 4, "TC-U-23: selectGenre 5");
+}
+
+// TC-U-24: 不正範囲入力→再選択
+bool testSelectGenreInvalidThenValid()
+{
+    const auto questions = createTestQuestionSets();
+    CinRedirect input("0\n6\na\n1\ny\n");
+    const int result = ConsoleUI::selectGenre(questions);
+    return check(result == 0, "TC-U-24: selectGenre invalid then valid");
+}
+
+// TC-U-25: キャンセル後の再選択
+bool testSelectGenreCancelThenSelect()
+{
+    const auto questions = createTestQuestionSets();
+    CinRedirect input("1\nn\n2\ny\n");
+    const int result = ConsoleUI::selectGenre(questions);
+    return check(result == 1, "TC-U-25: selectGenre cancel then select 2");
+}
+
+// TC-U-26: 通常回答（1行ずつ）
+bool testAskQuestionsOneLine()
+{
+    const QuestionSet questionSet("小説・物語", "ストーリーや登場人物の心情を楽しむ本", { "質問1", "質問2", "質問3", "質問4", "質問5", "質問6" });
     CinRedirect input("回答1\n\n回答2\n\n回答3\n\n回答4\n\n回答5\n\n回答6\n\n");
     const auto answers = ConsoleUI::askQuestions(questionSet);
-    return check(answers.size() == 6 && answers[0] == "回答1" && answers[5] == "回答6", "askQuestions one line");
+    return check(answers.size() == 6 && answers[0] == "回答1" && answers[5] == "回答6", "TC-U-26: askQuestions one line");
 }
 
-bool testAskQuestionsSkip() // skipを入力するとスキップになるかテストします。
+// TC-U-27: スキップ処理 (skip 入力)
+bool testAskQuestionsSkip()
 {
-    const QuestionSet questionSet("小説・物語", { "質問1", "質問2", "質問3", "質問4", "質問5", "質問6" });
+    const QuestionSet questionSet("小説・物語", "ストーリーや登場人物の心情を楽しむ本", { "質問1", "質問2", "質問3", "質問4", "質問5", "質問6" });
     CinRedirect input("skip\nskip\nskip\nskip\nskip\nskip\n");
     const auto answers = ConsoleUI::askQuestions(questionSet);
-    return check(answers.size() == 6 && answers[0] == "(スキップ)" && answers[5] == "(スキップ)", "askQuestions all skip");
+    return check(answers.size() == 6 && answers[0] == "(スキップ)" && answers[5] == "(スキップ)", "TC-U-27: askQuestions all skip command");
 }
 
-bool testAskQuestionsSkipWordIsNotPartialMatch() // skipperなどをskipと誤認しないかテストします。
+// TC-U-28: スキップ処理 (未入力Enter)
+bool testAskQuestionsSkipEmpty()
 {
-    const QuestionSet questionSet("小説・物語", { "質問1", "質問2", "質問3", "質問4", "質問5", "質問6" });
+    const QuestionSet questionSet("小説・物語", "ストーリーや登場人物の心情を楽しむ本", { "質問1", "質問2", "質問3", "質問4", "質問5", "質問6" });
+    CinRedirect input("\n\n\n\n\n\n");
+    const auto answers = ConsoleUI::askQuestions(questionSet);
+    return check(answers.size() == 6 && answers[0] == "(スキップ)" && answers[5] == "(スキップ)", "TC-U-28: askQuestions all skip by empty Enter");
+}
+
+// TC-U-29: 複数行回答（改行エスケープ \）
+bool testAskQuestionsMultilineEscape()
+{
+    const QuestionSet questionSet("小説・物語", "ストーリーや登場人物の心情を楽しむ本", { "質問1", "質問2", "質問3", "質問4", "質問5", "質問6" });
+    CinRedirect input("行1\\\n行2\n\n回答2\n\n回答3\n\n回答4\n\n回答5\n\n回答6\n\n");
+    const auto answers = ConsoleUI::askQuestions(questionSet);
+    return check(answers.size() == 6 && answers[0] == "行1\n行2", "TC-U-29: askQuestions multiline escape");
+}
+
+// TC-U-30: skip 部分一致の誤認防止
+bool testAskQuestionsSkipWordIsNotPartialMatch()
+{
+    const QuestionSet questionSet("小説・物語", "ストーリーや登場人物の心情を楽しむ本", { "質問1", "質問2", "質問3", "質問4", "質問5", "質問6" });
     CinRedirect input("skipper\n\nskipです\n\n通常回答\n\nskip\n\n回答5\n\n回答6\n\n");
     const auto answers = ConsoleUI::askQuestions(questionSet);
     const bool first = answers.size() >= 1 && answers[0] == "skipper";
     const bool second = answers.size() >= 2 && answers[1] == "skipです";
     const bool fourth = answers.size() >= 4 && answers[3] == "(スキップ)";
-    return check(first && second && fourth, "askQuestions skip partial match");
-} // テスト終了です。
+    return check(first && second && fourth, "TC-U-30: askQuestions skip partial match");
+}
 
-int runConsoleUITests() // ConsoleUIの全テストを実行します。
-{ // 関数開始です。
-    int failed = 0; // 失敗件数を0で開始します。
-    std::cout << "\n--- ConsoleUI tests ---\n"; // ConsoleUIテストの見出しを表示します。
-    failed += !testInputDateValidMin(); // 260101の結果を集計します。
-    failed += !testInputDateValidMax(); // 261231の結果を集計します。
-    failed += !testInputDateInvalidMonthAndDay(); // 月日範囲外の結果を集計します。
-    failed += !testInputDateValidMonth(); // 2601の結果を集計します。
-    failed += !testInputDateValidMonthMax(); // 2612の結果を集計します。
-    failed += !testInputDateInvalidMonthFormat(); // YYMM範囲外の結果を集計します。
-    failed += !testInputDateSeasons(); // 4季節の結果を集計します。
-    failed += !testInputDateInvalidSeason(); // 不正季節の結果を集計します。
-    failed += !testInputDateEmpty(); // 空入力の結果を集計します。
-    failed += !testInputDateDifferentFormat(); // 別形式の結果を集計します。
-    failed += !testInputTitleValid(); // 通常タイトルの結果を集計します。
-    failed += !testInputTitleQ84(); // 1Q84の結果を集計します。
-    failed += !testInputTitle50Characters(); // 50文字タイトルの結果を集計します。
-    failed += !testInputTitle51Characters(); // 51文字タイトルの結果を集計します。
-    failed += !testInputTitleEmpty(); // 空タイトルの結果を集計します。
-    failed += !testInputTitleSpaces(); // スペースタイトルの結果を集計します。
-    failed += !testInputAuthorValid(); // 通常著者名の結果を集計します。
-    failed += !testInputAuthorEmpty(); // 空著者名の結果を集計します。
-    failed += !testInputAuthor50Characters(); // 50文字著者名の結果を集計します。
-    failed += !testSelectGenreFirst(); // ジャンル1の結果を集計します。
-    failed += !testSelectGenreLast(); // ジャンル5の結果を集計します。
-    failed += !testSelectGenreInvalidThenValid(); // 不正入力後の正常入力の結果を集計します。
-    failed += !testSelectGenreCancelThenSelect(); // nで取り消した後の再選択結果を集計します。
-    failed += !testAskQuestionsOneLine(); // 1行回答の結果を集計します。
-    failed += !testAskQuestionsSkip(); // 全問skipの結果を集計します。
-    failed += !testAskQuestionsSkipWordIsNotPartialMatch(); // skipperなどの結果を集計します。
-    return failed; // このファイルの失敗件数を返します。
-} // 関数終了です。
+int runConsoleUITests()
+{
+    int failed = 0;
+    std::cout << "\n--- ConsoleUI tests ---\n";
+    failed += !testInputDateUnknown();
+    failed += !testInputDateValidMin();
+    failed += !testInputDateValidMax();
+    failed += !testInputDateInvalidMonthAndDay();
+    failed += !testInputDateValidMonth();
+    failed += !testInputDateValidMonthMax();
+    failed += !testInputDateInvalidMonthFormat();
+    failed += !testInputDateSeasons();
+    failed += !testInputDateInvalidSeason();
+    failed += !testInputDateEmptyAuto();
+    failed += !testInputDateDifferentFormat();
+    failed += !testInputTitleValid();
+    failed += !testInputTitleQ84();
+    failed += !testInputTitle50Characters();
+    failed += !testInputTitle51Characters();
+    failed += !testInputTitleEmptyAuto();
+    failed += !testInputTitleSpacesAuto();
+    failed += !testInputAuthorValid();
+    failed += !testInputAuthorEmptyAuto();
+    failed += !testInputAuthor50Characters();
+    failed += !testInputAuthor51Characters();
+    failed += !testSelectGenreFirst();
+    failed += !testSelectGenreLast();
+    failed += !testSelectGenreInvalidThenValid();
+    failed += !testSelectGenreCancelThenSelect();
+    failed += !testAskQuestionsOneLine();
+    failed += !testAskQuestionsSkip();
+    failed += !testAskQuestionsSkipEmpty();
+    failed += !testAskQuestionsMultilineEscape();
+    failed += !testAskQuestionsSkipWordIsNotPartialMatch();
+    return failed;
+}

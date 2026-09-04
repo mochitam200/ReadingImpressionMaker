@@ -15,30 +15,30 @@
 class CsvLoader {
 public:
 	// 指定されたファイル名からCSVを読み込み、QuestionSetのリストにして返す静的関数
-	static std::vector<QuestionSet> load(const std::string& filename) { // load 関数にファイル名を渡す
+	static std::vector<QuestionSet> load(const std::string& filename) {
 		std::vector<QuestionSet> result;  // 戻り値となる質問セットのリストを用意
 
-		// BOMの有無や改行コードを正しく処理するため、バイナリモードでファイルを開
+		// BOMの有無や改行コードを正しく処理するため、バイナリモードでファイルを開く
 		std::ifstream file(filename, std::ios::binary);
-		if (!file.is_open())return result; // ファイルが存在しない・開けない場合は空の配列を返す
+		if (!file.is_open()) return result; // ファイルが存在しない・開けない場合は空の配列を返す
 
 		// ファイルの全内容を1つの文字列へ一括で読み込み
-		std::string content((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>()); // file の現在位置からファイルの最後まで文字を1文字ずつ全部読み込んで content に保存
+		std::string content((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
 		file.close(); // ファイルを閉じる
 
-		if (content.empty())return result; // 中身が0バイト（空）なら空の配列を返す
+		if (content.empty()) return result; // 中身が0バイト（空）なら空の配列を返す
 
-		// 先頭に UTF-8 BOM（0xEF, 0xBB, 0xBF）が含まれている場合、それを取り除く,文字としてではなくバイトの数値として比較
-		if (content.size() >= 3 &&        // content の中身が3バイト以上あるかを確認
-			static_cast<unsigned char>(content[0]) == 0xEF &&      // content の1バイト目が EF か確認
-			static_cast<unsigned char>(content[1]) == 0xBB &&      // 2バイト目が BB か確認
-			static_cast<unsigned char>(content[2]) == 0xBF ) {   // 3バイト目が BF か確認
-			content = content.substr(3);    // ファイルの先頭にUTF-8のBOM（EF BB BF）が付いていたら、先頭3バイトを切り捨てて読み飛ばし
+		// 先頭に UTF-8 BOM（0xEF, 0xBB, 0xBF）が含まれている場合、それを取り除く
+		if (content.size() >= 3 &&
+			static_cast<unsigned char>(content[0]) == 0xEF &&
+			static_cast<unsigned char>(content[1]) == 0xBB &&
+			static_cast<unsigned char>(content[2]) == 0xBF) {
+			content = content.substr(3);
 		}
-			
+
 		// 改行コード（LF または CRLF）に対応しながら、1行ずつの配列へ分割
 		std::vector<std::string> lines;
-		std::string currentLine;	
+		std::string currentLine;
 		for (size_t i = 0; i < content.size(); i++) {
 			char c = content[i];
 			if (c == '\r') {
@@ -47,80 +47,81 @@ public:
 					i++;
 				}
 				lines.push_back(currentLine); // 1行分として登録
-				currentLine.clear(); // currentLine の中身を消去する
+				currentLine.clear();
 			}
 			else if (c == '\n') { // LF単体の改行にも対応
 				lines.push_back(currentLine);
 				currentLine.clear();
 			}
 			else {
-				currentLine.push_back(c); // 通常の文字は現在の行に追加
+				currentLine.push_back(c);
 			}
 		}
 
-		if (!currentLine.empty()) { // 最終行が空行（不要な末尾の空行など）でない場合のみ
-			lines.push_back(currentLine); // ファイル末尾の最終行を追加
+		if (!currentLine.empty()) {
+			lines.push_back(currentLine);
 		}
 
 		// ファイル末尾に余分な空行があれば削除
-		while (!lines.empty() && lines.back().empty()) { // リストが空でない & リストの一番後ろの要素が空
-			lines.pop_back(); // リストの一番後ろの要素を削除
+		while (!lines.empty() && lines.back().empty()) {
+			lines.pop_back();
 		}
 
 		// 仕様により、データが30行未満の場合はエラー（空の配列を返す）と判定
 		if (lines.size() < 30) return result;
 
-		// ジャンルごとに「ジャンル名」と「質問番号 -> 質問文」を一時保存する構造体
+		// ジャンルごとに「ジャンル名」「ジャンル説明」「質問番号 -> 質問文」を一時保存する構造体
 		struct GenreData {
 			std::string name;
-			std::map<int, std::string> questions; // 問題の番号と問題文のセットを保存する連想配列（マップ）
+			std::string description;
+			std::map<int, std::string> questions;
 		};
-		std::map<int, GenreData> genres; // ジャンル番号 -> ジャンルデータ(ジャンル番号（キー）とそのジャンルデータ（値）を紐付ける全体の連想配列)
+		std::map<int, GenreData> genres;
 
 		// CSVの各行を解析
-		for (const auto& line : lines) { // lines の中身を1行ずつ取り出して line に入れる
+		for (const auto& line : lines) {
 			if (line.empty()) continue; // 空行はスキップ
 
 			std::vector<std::string> tokens;
-			std::string token;   // カンマで区切ったときに一時的に1個のデータを入れておく変数
-			std::stringstream ss(line); // line の文字列を、文字列ストリームとして扱えるようにする処理
+			std::string token;
+			std::stringstream ss(line);
 
 			// カンマ(',')で各カラム（列）に分割
-			while (std::getline(ss, token, ',')) { // ss から文字を読み取り、, が出てくるまでを token に入れる
-				tokens.push_back(token);  // 読み取った文字を tokens に追加
+			while (std::getline(ss, token, ',')) {
+				tokens.push_back(token);
 			}
 
-			// 1行あたりの列数が正確に4列でない場合はエラー（不正なCSV）とみなして空配列を返す
-			if (tokens.size() != 4) return {};
+			// 1行あたりの列数が正確に5列でない場合はエラー（不正なCSV）とみなして空配列を返す
+			if (tokens.size() != 5) return {};
 
 			// 文字列が数値のみで構成されているか判定する補助関数
-			auto isNumber = [](const std::string& s) {  // s という名前で文字列を受け取る
-				if (s.empty()) return false;            // s が空文字列か確認  空文字列なら false…「空文字列そのものを数字として扱わない」ためのチェック
-				return std::all_of(s.begin(), s.end(), ::isdigit);  // 文字列 s の最初から最後までが数字か調べ、全部数字なら true、1文字でも数字以外なら false を返す
-				// ※ std::all_of が「全部調べる」、::isdigit が「数字か調べる」
+			auto isNumber = [](const std::string& s) {
+				if (s.empty()) return false;
+				return std::all_of(s.begin(), s.end(), ::isdigit);
 				};
 
-			// 1列目（ジャンル番号）と 3列目（質問番号）が数値でない場合はエラー
-			if (!isNumber(tokens[0]) || !isNumber(tokens[2])) return {}; // ジャンル番号か質問番号のどちらかが数字ではなかったら、処理を終了
+			// 1列目（ジャンル番号）と 4列目（質問番号）が数値でない場合はエラー
+			if (!isNumber(tokens[0]) || !isNumber(tokens[3])) return {};
 
-			int genreNum = std::stoi(tokens[0]); // ジャンル番号を数値に変換
-			std::string genreName = tokens[1];   // ジャンル名を取得
-			int qNum = std::stoi(tokens[2]);     // 質問番号を数値に変換
-			std::string qText = tokens[3];       // 質問文を取得
+			int genreNum = std::stoi(tokens[0]);            // ジャンル番号を数値に変換
+			std::string genreName = tokens[1];              // ジャンル名を取得
+			std::string genreDescription = tokens[2];       // ジャンル説明を取得
+			int qNum = std::stoi(tokens[3]);                // 質問番号を数値に変換
+			std::string qText = tokens[4];                  // 質問文を取得
 
-			genres[genreNum].name = genreName;  // そのジャンル番号にジャンル名を保存
-			genres[genreNum].questions[qNum] = qText; // そのジャンルの、その質問番号に質問文を保存
+			genres[genreNum].name = genreName;
+			genres[genreNum].description = genreDescription;
+			genres[genreNum].questions[qNum] = qText;
 		}
 
 		// 整理したマップデータから QuestionSet の配列を組み立てる
-		// genres に保存されているジャンルと質問を取り出して、result という「質問セットの一覧」に変換
-		for (const auto& pair : genres) {     // genres の中身を1つずつ pair に取り出す
-			std::vector<std::string> qList;   // そのジャンルの質問文を一時的に保存する配列
-			for (const auto& qPair : pair.second.questions) {   // pair.second.questions の中から質問を1つずつ取り出し
-				qList.push_back(qPair.second);     // 質問文を番号順に qList に追加
+		for (const auto& pair : genres) {
+			std::vector<std::string> qList;
+			for (const auto& qPair : pair.second.questions) {
+				qList.push_back(qPair.second);
 			}
-			result.emplace_back(pair.second.name, qList);   // QuestionSetオブジェクトを作ってresult に登録
-		} 
+			result.emplace_back(pair.second.name, pair.second.description, qList);
+		}
 
 		return result; // 完成した質問セットのリストを返す
 	}

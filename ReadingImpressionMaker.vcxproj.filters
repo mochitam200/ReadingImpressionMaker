@@ -48,8 +48,5 @@
     <ClInclude Include="include\RecordExporter.hpp">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
-    <ClInclude Include="tests\TestData\TestCommon.hpp">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
   </ItemGroup>
 </Project>

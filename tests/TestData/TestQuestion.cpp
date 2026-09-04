@@ -1,184 +1,256 @@
 ﻿#include "../../include/Question.hpp" // テスト対象のQuestionSetとReadingRecordを使うために読み込みます。
 #include <iostream> // テスト結果を画面へ表示するために使います。
 #include <string> // 文字列を扱うために使います。
-#include <vector> // 質問と回答の配列を扱うために使います.
+#include <vector> // 質問と回答の配列を扱うために使います。
+#include <algorithm> // 文字列判定などに使います。
+#include <cctype> // 数字判定に使います。
 
 namespace // このファイルだけで使う補助関数を名前空間で囲みます。
 { // 無名名前空間の開始です。
 
-bool check(bool condition, const std::string& name) // 条件を確認して結果を表示する共通関数です。
-{ // check関数の開始です。
-    if (condition) // 期待した結果になっているか確認します。
-    { // 正常だった場合の開始です。
-        std::cout << "[PASS] " << name << '\n'; // テスト成功を表示します。
-        return true; // 成功したことを呼び出し側へ返します。
-    } // 正常だった場合の終了です。
+    bool check(bool condition, const std::string& name) // 条件を確認して結果を表示する共通関数です。
+    { // check関数の開始です。
+        if (condition) // 期待した結果になっているか確認します。
+        { // 正常だった場合の開始です。
+            std::cout << "[PASS] " << name << '\n'; // テスト成功を表示します。
+            return true; // 成功したことを呼び出し側へ返します。
+        } // 正常だった場合の終了です。
 
-    std::cout << "[FAIL] " << name << '\n'; // テスト失敗を表示します。
-    return false; // 失敗したことを呼び出し側へ返します。
-} // check関数の終了です。
+        std::cout << "[FAIL] " << name << '\n'; // テスト失敗を表示します。
+        return false; // 失敗したことを呼び出し側へ返します。
+    } // check関数の終了です。
 
 } // 無名名前空間の終了です。
 
-bool testQuestionSetConstructor() // QuestionSetのコンストラクタをテストします。
-{ // テスト開始です。
-    const std::vector<std::string> questions{ "質問1", "質問2", "質問3", "質問4", "質問5", "質問6" }; // テスト用に6つの質問を作ります。
-    const QuestionSet questionSet("小説・物語", questions); // ジャンル名と質問を使ってQuestionSetを作ります。
-    return check(questionSet.getGenreName() == "小説・物語" && questionSet.getQuestions() == questions, "QuestionSet constructor"); // 作成した内容が正しいか確認します。
-} // テスト終了です。
+// TC-Q-01: コンストラクタ検証
+bool testQuestionSetConstructor()
+{
+    const std::vector<std::string> questions{ "質問1", "質問2", "質問3", "質問4", "質問5", "質問6" };
+    const QuestionSet questionSet("小説・物語", "ストーリーや登場人物の心情を楽しむ本", questions);
+    return check(questionSet.getGenreName() == "小説・物語" &&
+        questionSet.getGenreDescription() == "ストーリーや登場人物の心情を楽しむ本" &&
+        questionSet.getQuestions() == questions,
+        "TC-Q-01: QuestionSet constructor");
+}
 
-bool testQuestionSetGetGenreName() // ジャンル名のgetterをテストします。
-{ // テスト開始です。
-    const QuestionSet questionSet("実用書", { "質問1", "質問2", "質問3", "質問4", "質問5", "質問6" }); // テスト用のQuestionSetを作ります。
-    return check(questionSet.getGenreName() == "実用書", "QuestionSet getGenreName"); // ジャンル名が正しく取得できるか確認します。
-} // テスト終了です。
+// TC-Q-02: ジャンル名取得
+bool testQuestionSetGetGenreName()
+{
+    const QuestionSet questionSet("実用書", "日常生活ですぐ使えるノウハウを提供する本", { "質問1", "質問2", "質問3", "質問4", "質問5", "質問6" });
+    return check(questionSet.getGenreName() == "実用書", "TC-Q-02: QuestionSet getGenreName");
+}
 
-bool testQuestionSetGetQuestions() // 質問一覧のgetterをテストします。
-{ // テスト開始です。
-    const std::vector<std::string> questions{ "質問1", "質問2", "質問3", "質問4", "質問5", "質問6" }; // 期待する質問一覧を作ります。
-    const QuestionSet questionSet("実用書", questions); // テスト用のQuestionSetを作ります。
-    return check(questionSet.getQuestions() == questions, "QuestionSet getQuestions"); // 質問一覧が正しく取得できるか確認します。
-} // テスト終了です。
+// TC-Q-03: ジャンル説明取得
+bool testQuestionSetGetGenreDescription()
+{
+    const QuestionSet questionSet("実用書", "日常生活ですぐ使えるノウハウを提供する本", { "質問1", "質問2", "質問3", "質問4", "質問5", "質問6" });
+    return check(questionSet.getGenreDescription() == "日常生活ですぐ使えるノウハウを提供する本", "TC-Q-03: QuestionSet getGenreDescription");
+}
 
-bool testQuestionSetGetQuestionFirst() // 最初の質問を取得できるかテストします。
-{ // テスト開始です。
-    const QuestionSet questionSet("小説・物語", { "質問1", "質問2", "質問3", "質問4", "質問5", "質問6" }); // 6問のテストデータを作ります。
-    return check(questionSet.getQuestion(0) == "質問1", "QuestionSet getQuestion first"); // 0番目の質問が1問目か確認します。
-} // テスト終了です。
+// TC-Q-04: 質問一覧取得
+bool testQuestionSetGetQuestions()
+{
+    const std::vector<std::string> questions{ "質問1", "質問2", "質問3", "質問4", "質問5", "質問6" };
+    const QuestionSet questionSet("実用書", "日常生活ですぐ使えるノウハウを提供する本", questions);
+    return check(questionSet.getQuestions() == questions, "TC-Q-04: QuestionSet getQuestions");
+}
 
-bool testQuestionSetGetQuestionLast() // 最後の質問を取得できるかテストします。
-{ // テスト開始です。
-    const QuestionSet questionSet("小説・物語", { "質問1", "質問2", "質問3", "質問4", "質問5", "質問6" }); // 6問のテストデータを作ります。
-    return check(questionSet.getQuestion(5) == "質問6", "QuestionSet getQuestion last"); // 5番目の質問が6問目か確認します。
-} // テスト終了です。
+// TC-Q-05: 0番目の質問取得
+bool testQuestionSetGetQuestionFirst()
+{
+    const QuestionSet questionSet("小説・物語", "ストーリーや登場人物の心情を楽しむ本", { "質問1", "質問2", "質問3", "質問4", "質問5", "質問6" });
+    return check(questionSet.getQuestion(0) == "質問1", "TC-Q-05: QuestionSet getQuestion first");
+}
 
-bool testQuestionSetGetQuestionCount() // 質問数を取得できるかテストします。
-{ // テスト開始です。
-    const QuestionSet questionSet("小説・物語", { "質問1", "質問2", "質問3", "質問4", "質問5", "質問6" }); // 6問のテストデータを作ります。
-    return check(questionSet.getQuestionCount() == 6, "QuestionSet getQuestionCount"); // 質問数が6になっているか確認します。
-} // テスト終了です。
+// TC-Q-06: 5番目の質問取得
+bool testQuestionSetGetQuestionLast()
+{
+    const QuestionSet questionSet("小説・物語", "ストーリーや登場人物の心情を楽しむ本", { "質問1", "質問2", "質問3", "質問4", "質問5", "質問6" });
+    return check(questionSet.getQuestion(5) == "質問6", "TC-Q-06: QuestionSet getQuestion last");
+}
 
-bool testReadingRecordConstructor() // ReadingRecordを生成できるかテストします。
-{ // テスト開始です。
-    ReadingRecord record; // ReadingRecordを生成します。
-    (void)record; // 生成した変数を使っていないという警告を防ぎます。
-    return check(true, "ReadingRecord constructor"); // 仕様書で初期値が定義されていないため生成できたことを確認します。
-} // テスト終了です。
+// TC-Q-07: 質問数取得
+bool testQuestionSetGetQuestionCount()
+{
+    const QuestionSet questionSet("小説・物語", "ストーリーや登場人物の心情を楽しむ本", { "質問1", "質問2", "質問3", "質問4", "質問5", "質問6" });
+    return check(questionSet.getQuestionCount() == 6, "TC-Q-07: QuestionSet getQuestionCount");
+}
 
-bool testReadingRecordSetDateUnknown() // 「不明」を設定できるかテストします。
-{ // テスト開始です。
+// TC-R-01: コンストラクタ検証
+bool testReadingRecordConstructor()
+{
+    ReadingRecord record;
+    (void)record;
+    return check(true, "TC-R-01: ReadingRecord constructor");
+}
+
+// TC-R-02: 読了日「不明」設定
+bool testReadingRecordSetDateUnknown()
+{
     ReadingRecord record;
     const bool result = record.setDate("不明");
-    return check(result && record.getDate() == "不明", "ReadingRecord setDate unknown");
-} // テスト終了です。
+    return check(result && record.getDate() == "不明", "TC-R-02: ReadingRecord setDate unknown");
+}
 
-bool testReadingRecordSetDateValid() // 正しい読了日を設定できるかテストします。
-{ // テスト開始です。
-    ReadingRecord record; // テスト対象のReadingRecordを作ります。
-    const bool result = record.setDate("260801"); // 正常な6桁の日付を設定します。
-    return check(result && record.getDate() == "260801", "ReadingRecord setDate valid"); // setterの戻り値と保存された値を確認します。
-} // テスト終了です。
+// TC-R-03: 読了日(6桁)正常設定
+bool testReadingRecordSetDateValid()
+{
+    ReadingRecord record;
+    const bool result = record.setDate("260801");
+    return check(result && record.getDate() == "260801", "TC-R-03: ReadingRecord setDate valid (260801)");
+}
 
-bool testReadingRecordSetDateInvalid() // 不正な読了日を拒否できるかテストします。
-{ // テスト開始です。
-    ReadingRecord record; // テスト対象のReadingRecordを作ります。
-    const bool result = record.setDate("26080"); // 5桁の不正な日付を設定してみます。
-    return check(!result, "ReadingRecord setDate invalid"); // 不正な入力なのでfalseになることを確認します。
-} // テスト終了です。
+// TC-R-04: 読了日不正文字数拒否
+bool testReadingRecordSetDateInvalid()
+{
+    ReadingRecord record;
+    const bool result = record.setDate("26080");
+    return check(!result, "TC-R-04: ReadingRecord setDate invalid (5 digits)");
+}
 
-bool testReadingRecordSetTitleValid() // 正常なタイトルを設定できるかテストします。
-{ // テスト開始です。
-    ReadingRecord record; // テスト対象のReadingRecordを作ります。
-    const bool result = record.setTitle("人間失格"); // 正常なタイトルを設定します。
-    return check(result && record.getTitle() == "人間失格", "ReadingRecord setTitle valid"); // 設定成功と保存内容を確認します。
-} // テスト終了です。
+// TC-R-05: 読了日空文字自動補完（本日日付6桁）
+bool testReadingRecordSetDateEmptyAuto()
+{
+    ReadingRecord record;
+    const bool result = record.setDate("");
+    const std::string d = record.getDate();
+    // 6桁数字であり、月・日の範囲が正常か確認
+    const bool validTodayFormat = (d.length() == 6) &&
+        std::all_of(d.begin(), d.end(), ::isdigit) &&
+        (std::stoi(d.substr(2, 2)) >= 1 && std::stoi(d.substr(2, 2)) <= 12) &&
+        (std::stoi(d.substr(4, 2)) >= 1 && std::stoi(d.substr(4, 2)) <= 31);
+    return check(result && validTodayFormat, "TC-R-05: ReadingRecord setDate empty auto-complete");
+}
 
-bool testReadingRecordSetTitleEmpty() // 空のタイトルを拒否できるかテストします。
-{ // テスト開始です。
-    ReadingRecord record; // テスト対象のReadingRecordを作ります。
-    const bool result = record.setTitle(""); // 空文字を設定してみます。
-    return check(!result, "ReadingRecord setTitle empty"); // 空文字なのでfalseになることを確認します。
-} // テスト終了です。
+// TC-R-06: タイトル正常設定
+bool testReadingRecordSetTitleValid()
+{
+    ReadingRecord record;
+    const bool result = record.setTitle("人間失格");
+    return check(result && record.getTitle() == "人間失格", "TC-R-06: ReadingRecord setTitle valid");
+}
 
-bool testReadingRecordSetTitle50Characters() // 50文字のタイトルを受け付けるかテストします。
-{ // テスト開始です。
-    ReadingRecord record; // テスト対象のReadingRecordを作ります。
-    const std::string title(50, 'A'); // ASCII文字を50個並べて50文字のタイトルを作ります。
-    const bool result = record.setTitle(title); // 50文字のタイトルを設定します。
-    return check(result && record.getTitle() == title, "ReadingRecord setTitle 50 characters"); // 上限値が受理されるか確認します。
-} // テスト終了です。
+// TC-R-07: タイトル空文字自動補完
+bool testReadingRecordSetTitleEmpty()
+{
+    ReadingRecord record;
+    const bool result = record.setTitle("");
+    return check(result && record.getTitle() == "Unknown_title", "TC-R-07: ReadingRecord setTitle empty auto-complete");
+}
 
-bool testReadingRecordSetTitle51Characters() // 51文字のタイトルを拒否できるかテストします。
-{ // テスト開始です。
-    ReadingRecord record; // テスト対象のReadingRecordを作ります。
-    const std::string title(51, 'A'); // ASCII文字を51個並べて上限超過のタイトルを作ります。
-    const bool result = record.setTitle(title); // 51文字のタイトルを設定してみます。
-    return check(!result, "ReadingRecord setTitle 51 characters"); // 上限を超えているためfalseになることを確認します。
-} // テスト終了です。
+// TC-R-08: タイトル境界値 50文字設定
+bool testReadingRecordSetTitle50Characters()
+{
+    ReadingRecord record;
+    const std::string title(50, 'A');
+    const bool result = record.setTitle(title);
+    return check(result && record.getTitle() == title, "TC-R-08: ReadingRecord setTitle 50 characters");
+}
 
-bool testReadingRecordSetAuthorValid() // 正常な著者名を設定できるかテストします。
-{ // テスト開始です。
-    ReadingRecord record; // テスト対象のReadingRecordを作ります。
-    const bool result = record.setAuthor("太宰治"); // 著者名を設定します。
-    return check(result && record.getAuthor() == "太宰治", "ReadingRecord setAuthor valid"); // 設定成功と保存内容を確認します。
-} // テスト終了です。
+// TC-R-09: タイトル境界値 51文字拒否
+bool testReadingRecordSetTitle51Characters()
+{
+    ReadingRecord record;
+    const std::string title(51, 'A');
+    const bool result = record.setTitle(title);
+    return check(!result, "TC-R-09: ReadingRecord setTitle 51 characters rejected");
+}
 
-bool testReadingRecordSetAuthorEmpty() // 空の著者名を拒否できるかテストします。
-{ // テスト開始です。
-    ReadingRecord record; // テスト対象のReadingRecordを作ります。
-    const bool result = record.setAuthor(""); // 空文字を設定してみます。
-    return check(!result, "ReadingRecord setAuthor empty"); // 空文字なのでfalseになることを確認します。
-} // テスト終了です。
+// TC-R-10: 著者名正常設定
+bool testReadingRecordSetAuthorValid()
+{
+    ReadingRecord record;
+    const bool result = record.setAuthor("太宰治");
+    return check(result && record.getAuthor() == "太宰治", "TC-R-10: ReadingRecord setAuthor valid");
+}
 
-bool testReadingRecordSetGenre() // ジャンルを設定できるかテストします。
-{ // テスト開始です。
-    ReadingRecord record; // テスト対象のReadingRecordを作ります。
-    record.setGenre(0, "小説・物語"); // 0番目のジャンルとして小説・物語を設定します。
-    return check(record.getGenreIndex() == 0 && record.getGenreName() == "小説・物語", "ReadingRecord setGenre"); // 番号と名前の両方を確認します。
-} // テスト終了です。
+// TC-R-11: 著者名空文字自動補完
+bool testReadingRecordSetAuthorEmpty()
+{
+    ReadingRecord record;
+    const bool result = record.setAuthor("");
+    return check(result && record.getAuthor() == "Unknown_author", "TC-R-11: ReadingRecord setAuthor empty auto-complete");
+}
 
-bool testReadingRecordSetAnswers() // 6つの回答をまとめて設定できるかテストします。
-{ // テスト開始です。
-    ReadingRecord record; // テスト対象のReadingRecordを作ります。
-    const std::vector<std::string> answers{ "回答1", "回答2", "回答3", "(スキップ)", "回答5", "回答6" }; // テスト用の6つの回答を作ります。
-    record.setAnswers(answers); // 回答一覧を設定します。
-    return check(record.getAnswers() == answers, "ReadingRecord setAnswers"); // 設定した回答一覧と取得結果を比較します。
-} // テスト終了です。
+// TC-R-12: 著者名境界値 50文字設定
+bool testReadingRecordSetAuthor50Characters()
+{
+    ReadingRecord record;
+    const std::string author(50, 'A');
+    const bool result = record.setAuthor(author);
+    return check(result && record.getAuthor() == author, "TC-R-12: ReadingRecord setAuthor 50 characters");
+}
 
-bool testReadingRecordSetAnswer() // 1つだけ回答を修正できるかテストします。
-{ // テスト開始です。
-    ReadingRecord record; // テスト対象のReadingRecordを作ります。
-    const std::vector<std::string> answers{ "回答1", "回答2", "回答3", "回答4", "回答5", "回答6" }; // 6つの初期回答を作ります。
-    record.setAnswers(answers); // 初期回答を設定します。
-    record.setAnswer(1, "修正後の回答"); // 2問目だけを修正します。
-    const bool unchanged = record.getAnswer(0) == "回答1" && record.getAnswer(2) == "回答3" && record.getAnswer(3) == "回答4" && record.getAnswer(4) == "回答5" && record.getAnswer(5) == "回答6";
-    return check(record.getAnswer(1) == "修正後の回答" && unchanged, "ReadingRecord setAnswer"); // 修正対象だけが変わったことを確認します。
-} // テスト終了です。
+// TC-R-13: 著者名境界値 51文字拒否
+bool testReadingRecordSetAuthor51Characters()
+{
+    ReadingRecord record;
+    const std::string author(51, 'A');
+    const bool result = record.setAuthor(author);
+    return check(!result, "TC-R-13: ReadingRecord setAuthor 51 characters rejected");
+}
 
+// TC-R-14: ジャンル設定
+bool testReadingRecordSetGenre()
+{
+    ReadingRecord record;
+    record.setGenre(0, "小説・物語");
+    return check(record.getGenreIndex() == 0 && record.getGenreName() == "小説・物語", "TC-R-14: ReadingRecord setGenre");
+}
 
-int runQuestionTests() // QuestionSetとReadingRecordの全テストを実行します。
-{ // 関数開始です。
-    int failed = 0; // 失敗件数を0で開始します。
-    std::cout << "\n--- QuestionSet tests ---\n"; // QuestionSetテストの見出しを表示します。
-    failed += !testQuestionSetConstructor(); // コンストラクタのテスト結果を集計します。
-    failed += !testQuestionSetGetGenreName(); // ジャンル名getterのテスト結果を集計します。
-    failed += !testQuestionSetGetQuestions(); // 質問一覧getterのテスト結果を集計します。
-    failed += !testQuestionSetGetQuestionFirst(); // 先頭質問のテスト結果を集計します。
-    failed += !testQuestionSetGetQuestionLast(); // 最後の質問のテスト結果を集計します。
-    failed += !testQuestionSetGetQuestionCount(); // 質問数のテスト結果を集計します。
-    std::cout << "\n--- ReadingRecord tests ---\n"; // ReadingRecordテストの見出しを表示します。
-    failed += !testReadingRecordConstructor(); // コンストラクタのテスト結果を集計します。
-    failed += !testReadingRecordSetDateUnknown(); // 「不明」日付のテスト結果を集計します（★追加）
-    failed += !testReadingRecordSetDateValid(); // 正常な日付のテスト結果を集計します。
-    failed += !testReadingRecordSetDateInvalid(); // 不正な日付のテスト結果を集計します。
-    failed += !testReadingRecordSetTitleValid(); // 正常なタイトルのテスト結果を集計します。
-    failed += !testReadingRecordSetTitleEmpty(); // 空タイトルのテスト結果を集計します。
-    failed += !testReadingRecordSetTitle50Characters(); // 50文字タイトルのテスト結果を集計します。
-    failed += !testReadingRecordSetTitle51Characters(); // 51文字タイトルのテスト結果を集計します。
-    failed += !testReadingRecordSetAuthorValid(); // 正常な著者名のテスト結果を集計します。
-    failed += !testReadingRecordSetAuthorEmpty(); // 空著者名のテスト結果を集計します。
-    failed += !testReadingRecordSetGenre(); // ジャンル設定のテスト結果を集計します。
-    failed += !testReadingRecordSetAnswers(); // 回答一覧のテスト結果を集計します。
-    failed += !testReadingRecordSetAnswer(); // 個別回答修正のテスト結果を集計します。
-    return failed; // このファイルで発生した失敗件数を返します。
-} // 関数終了です。
+// TC-R-15: 全回答設定
+bool testReadingRecordSetAnswers()
+{
+    ReadingRecord record;
+    const std::vector<std::string> answers{ "回答1", "回答2", "回答3", "(スキップ)", "回答5", "回答6" };
+    record.setAnswers(answers);
+    return check(record.getAnswers() == answers, "TC-R-15: ReadingRecord setAnswers");
+}
+
+// TC-R-16: 個別回答変更
+bool testReadingRecordSetAnswer()
+{
+    ReadingRecord record;
+    const std::vector<std::string> answers{ "回答1", "回答2", "回答3", "回答4", "回答5", "回答6" };
+    record.setAnswers(answers);
+    record.setAnswer(1, "修正後の回答");
+    const bool unchanged = record.getAnswer(0) == "回答1" &&
+        record.getAnswer(2) == "回答3" &&
+        record.getAnswer(3) == "回答4" &&
+        record.getAnswer(4) == "回答5" &&
+        record.getAnswer(5) == "回答6";
+    return check(record.getAnswer(1) == "修正後の回答" && unchanged, "TC-R-16: ReadingRecord setAnswer");
+}
+
+int runQuestionTests()
+{
+    int failed = 0;
+    std::cout << "\n--- QuestionSet tests ---\n";
+    failed += !testQuestionSetConstructor();
+    failed += !testQuestionSetGetGenreName();
+    failed += !testQuestionSetGetGenreDescription();
+    failed += !testQuestionSetGetQuestions();
+    failed += !testQuestionSetGetQuestionFirst();
+    failed += !testQuestionSetGetQuestionLast();
+    failed += !testQuestionSetGetQuestionCount();
+
+    std::cout << "\n--- ReadingRecord tests ---\n";
+    failed += !testReadingRecordConstructor();
+    failed += !testReadingRecordSetDateUnknown();
+    failed += !testReadingRecordSetDateValid();
+    failed += !testReadingRecordSetDateInvalid();
+    failed += !testReadingRecordSetDateEmptyAuto();
+    failed += !testReadingRecordSetTitleValid();
+    failed += !testReadingRecordSetTitleEmpty();
+    failed += !testReadingRecordSetTitle50Characters();
+    failed += !testReadingRecordSetTitle51Characters();
+    failed += !testReadingRecordSetAuthorValid();
+    failed += !testReadingRecordSetAuthorEmpty();
+    failed += !testReadingRecordSetAuthor50Characters();
+    failed += !testReadingRecordSetAuthor51Characters();
+    failed += !testReadingRecordSetGenre();
+    failed += !testReadingRecordSetAnswers();
+    failed += !testReadingRecordSetAnswer();
+
+    return failed;
+}
