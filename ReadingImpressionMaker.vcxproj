@@ -141,7 +141,7 @@
     </Manifest>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="RecordExporter.cpp" />
+    <ClCompile Include="src\RecordExporter.cpp" />
     <ClCompile Include="src\CsvLoader.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="tests\TestData\TestConsoleUI.cpp" />
