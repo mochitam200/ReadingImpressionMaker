@@ -267,19 +267,18 @@ int main()
             size_t qIdx = static_cast<size_t>(choice - 5);
             std::cout << "\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n";
             std::cout << "  📝 質問 " << (qIdx + 1) << "/" << totalQuestions << " (修正)\n";
-            std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n";
-            std::cout << questionSets[genreIndex].getQuestion(qIdx) << "\n\n";
+            std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n";
             std::cout << "※ 改行したい場合は文末に \\ を入力してEnterで次の行へ\n";
             std::cout << "※ 回答を終了するには空行でEnterを押してください\n";
-            std::cout << "※ この質問をスキップするには「skip」と入力してください(未入力でEnter入力でもスキップされます)\n\n";
-            std::cout << "> ";
+            std::cout << "※ この質問をスキップするには「skip」と入力してください(未入力でEnter入力でもスキップされます)\n";
 
             QuestionSet singleQs(
                 questionSets[genreIndex].getGenreName(),
                 questionSets[genreIndex].getGenreDescription(),
                 { questionSets[genreIndex].getQuestion(qIdx) }
             );
-            std::vector<std::string> singleAns = ConsoleUI::askQuestions(singleQs);
+            // 第2引数に対象の質問番号 (qIdx + 1) を指定
+            std::vector<std::string> singleAns = ConsoleUI::askQuestions(singleQs, qIdx + 1);
             if (!singleAns.empty()) {
                 record.setAnswer(qIdx, singleAns[0]);
             }

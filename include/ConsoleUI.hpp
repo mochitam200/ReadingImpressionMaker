@@ -85,14 +85,14 @@ public:
         return -1; // 入力が終了してしまった場合はエラー値を返す
     }
 
-    // 質問ごとにユーザーからの回答入力を収集する関数
-    static std::vector<std::string> askQuestions(const QuestionSet& questionSet) {
+    // 質問ごとにユーザーからの回答入力を収集する関数（startNumberで開始質問番号を指定可能）
+    static std::vector<std::string> askQuestions(const QuestionSet& questionSet, size_t startNumber = 1) {
         std::vector<std::string> answers; // 各質問への回答を格納する配列
         size_t count = questionSet.getQuestionCount(); // 質問の総数を取得
 
         for (size_t i = 0; i < count; ++i) {
             std::cout << "\n----------------------------------------\n";
-            std::cout << " Q" << (i + 1) << ": " << questionSet.getQuestion(i) << "\n";
+            std::cout << " Q" << (startNumber + i) << ": " << questionSet.getQuestion(i) << "\n";
             std::cout << "----------------------------------------\n> ";
 
             std::string line;

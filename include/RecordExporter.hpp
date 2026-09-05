@@ -43,8 +43,11 @@ public:
             std::string titleStr = sanitizeFilename(record.getTitle());
             std::string authorStr = sanitizeFilename(record.getAuthor());
 
-            // 出力先のファイルパス（例: output/260801_人間失格_太宰治.txt）を組み立て
-            fs::path filePath = fs::path("output") / (dateStr + "_" + titleStr + "_" + authorStr + ".txt");
+            // 出力先のファイル名（例: 260801_人間失格_太宰治.txt）を組み立て
+            std::string fileName = dateStr + "_" + titleStr + "_" + authorStr + ".txt";
+
+            // C++20標準: UTF-8文字列 (char8_t*) から安全にファイルパスを構築
+            fs::path filePath = fs::path("output") / fs::path(reinterpret_cast<const char8_t*>(fileName.c_str()));
 
             // BOMを正確に出力できるようバイナリモードでファイルを開く
             std::ofstream file(filePath, std::ios::binary);
