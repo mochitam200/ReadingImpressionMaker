@@ -141,11 +141,14 @@
     </Manifest>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="RecordExporter.cpp" />
+    <ClCompile Include="src\CsvLoader.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="tests\TestData\TestConsoleUI.cpp" />
     <ClCompile Include="tests\TestData\TestCsvLoader.cpp" />
     <ClCompile Include="tests\TestData\TestQuestion.cpp" />
     <ClCompile Include="tests\TestData\TestRecordExporter.cpp" />
+    <ClCompile Include="src\ConsoleUI.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="book_review_questions.csv" />
