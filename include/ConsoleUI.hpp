@@ -67,7 +67,7 @@ public:
         return ""; // 最後まで正しい著者名を受け取れなかった場合は空文字列を返す
     }
 
-    // ジャンル選択番号と、最終確認 ('y') を受け取ってインデックス番号（0始まり）を返す
+    // ジャンル選択番号を受け取ってインデックス番号（0始まり）を返す
     static int selectGenre(const std::vector<QuestionSet>& questions) {
         std::string line;
         while (std::getline(std::cin, line)) { // 番号入力を受け取る
@@ -76,16 +76,11 @@ public:
                 int choice = std::stoi(line);   // 入力された文字列を数値に変換
                 // 選択番号が 1 〜 ジャンル数 の範囲内にあるかチェック
                 if (choice >= 1 && choice <= static_cast<int>(questions.size())) {
-                    std::string confirm;
-                    // 次の入力で確認用の応答（y/nなど）を受け取る
-                    if (std::getline(std::cin, confirm)) {
-                        if (confirm == "y" || confirm == "Y") { // 'y' が入力されたら確定
-                            return choice - 1; // プログラム内で扱いやすいよう「0始まりの番号」で返す
-                        }
-                        // 'n' などの場合は確定せず、最初のジャンル選択入力に戻る
-                    }
+                    return choice - 1; // プログラム内で扱いやすいよう「0始まりの番号」で返す
                 }
             }
+            // 範囲外の数字や無効な入力だった場合の案内表示（任意）
+            std::cout << "無効な入力です。1 〜 " << questions.size() << " の番号を入力してください。\n> ";
         }
         return -1; // 入力が終了してしまった場合はエラー値を返す
     }
@@ -96,6 +91,10 @@ public:
         size_t count = questionSet.getQuestionCount(); // 質問の総数を取得
 
         for (size_t i = 0; i < count; ++i) {
+            std::cout << "\n----------------------------------------\n";
+            std::cout << " Q" << (i + 1) << ": " << questionSet.getQuestion(i) << "\n";
+            std::cout << "----------------------------------------\n> ";
+
             std::string line;
             std::string fullAnswer; // 複数行にわたる回答を結合するための文字列
             bool isFirstLine = true; // 1行目の入力かどうかを識別するフラグ

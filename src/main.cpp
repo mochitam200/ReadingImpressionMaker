@@ -1,4 +1,4 @@
-#include "../include/Question.hpp"       // QuestionSet, ReadingRecord クラスを使用
+﻿#include "../include/Question.hpp"       // QuestionSet, ReadingRecord クラスを使用
 #include "../include/CsvLoader.hpp"      // CSV読み込み機能を使用
 #include "../include/ConsoleUI.hpp"      // コンソール入力機能を使用
 #include "../include/RecordExporter.hpp" // ファイル出力機能を使用
@@ -100,7 +100,7 @@ int main()
     std::cout << "・何年+何月(例：2601)\n";
     std::cout << "・何年+季節(例：26春)\n";
     std::cout << "・不明\n";
-    std::cout << "※空欄のままEnterを押すと本日の日付6桁が適用されます\n";
+    std::cout << "※ 空欄のままEnterを押すと本日の日付6桁が適用されます\n";
     std::cout << "> ";
 
     std::string date = ConsoleUI::inputDate();
@@ -114,7 +114,7 @@ int main()
 
     // ── 3. 書籍情報（タイトル・著者名）の入力 ──
     std::cout << "\n【OK！まずは書籍の情報を教えてください】\n";
-    std::cout << "※空欄でEnterを押した場合、タイトルは `Unknown_title`、著者は `Unknown_author` を自動適用します\n\n";
+    std::cout << "※ 空欄でEnterを押した場合、タイトルは `Unknown_title`、著者は `Unknown_author` を自動適用します\n\n";
 
     std::cout << "本のタイトルは？(50文字以内)\n";
     std::cout << "> ";
