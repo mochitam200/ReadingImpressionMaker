@@ -9,6 +9,10 @@
 #include <clocale>                    // ロケール設定のため
 #include <algorithm>                  // all_of 等
 
+#ifdef _WIN32
+#include <windows.h>                  // WindowsコンソールのUTF-8化に使用
+#endif
+
 // 補助関数: 文字列の各行にインデントを付加して表示
 static void printFormattedAnswer(const std::string& answer) {
     std::stringstream ss(answer);
@@ -18,7 +22,8 @@ static void printFormattedAnswer(const std::string& answer) {
         if (isFirst) {
             std::cout << "    → " << line << "\n";
             isFirst = false;
-        } else {
+        }
+        else {
             std::cout << "      " << line << "\n";
         }
     }
@@ -39,7 +44,8 @@ static void displayGenreList(const std::vector<QuestionSet>& questionSets) {
         std::string numStr;
         if (i < 20) {
             numStr = circledDigits[i];
-        } else {
+        }
+        else {
             numStr = "(" + std::to_string(i + 1) + ")";
         }
         std::cout << numStr << " " << questionSets[i].getGenreName();
@@ -67,7 +73,8 @@ static void displayConfirmation(const ReadingRecord& record, const QuestionSet& 
         std::cout << "[" << (i + 5) << "] 【質問" << (i + 1) << "】" << selectedQs.getQuestion(i) << "\n";
         if (i < answers.size()) {
             printFormattedAnswer(answers[i]);
-        } else {
+        }
+        else {
             std::cout << "    → (スキップ)\n";
         }
         std::cout << "\n";
@@ -77,6 +84,12 @@ static void displayConfirmation(const ReadingRecord& record, const QuestionSet& 
 
 int main()
 {
+#ifdef _WIN32
+    // Windowsコンソールの入出力コードページをUTF-8に設定
+    SetConsoleCP(CP_UTF8);
+    SetConsoleOutputCP(CP_UTF8);
+#endif
+
     // 日本語の入出力を正しく扱うためにロケールを設定
     std::setlocale(LC_ALL, ".UTF-8");
 
@@ -145,7 +158,7 @@ int main()
     record.setGenre(genreIndex, questionSets[genreIndex].getGenreName());
 
     // ── 5. ジャンル別質問への回答入力 ──
-    std::cout << "\n--- 質問に回答してください ---\n";
+    std::cout << "\n--- 以下の質問に回答していただきます ---\n";
     std::cout << "  ※ 改行したい場合は文末に \\ を入力してEnterで次の行へ\n";
     std::cout << "  ※ 回答を終了するには空行でEnterを押してください\n";
     std::cout << "  ※ この質問をスキップするには「skip」と入力してください(未入力でEnter入力でもスキップされます)\n\n";
