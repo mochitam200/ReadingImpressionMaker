@@ -1,4 +1,4 @@
-﻿#include "../include/RecordExporter.hpp"
+#include "../include/RecordExporter.hpp"
 #include <filesystem>
 #include <fstream>
 #include <clocale>
@@ -41,8 +41,10 @@ bool RecordExporter::exportToFile(const ReadingRecord& record, const std::vector
         std::string titleStr = sanitizeFilename(record.getTitle());
         std::string authorStr = sanitizeFilename(record.getAuthor());
 
-        // 保存先となるファイルパスを作成（例: output/2026-03-05_タイトル_著者.txt）
-        fs::path filePath = fs::path("output") / (dateStr + "_" + titleStr + "_" + authorStr + ".txt");
+        // ファイル名（UTF-8文字列）を作成
+        std::string filename = dateStr + "_" + titleStr + "_" + authorStr + ".txt";
+        // C++20対応: UTF-8文字列（全角文字等）をchar8_t経由でWindowsが理解できるファイルパスに変換
+        fs::path filePath = fs::path("output") / reinterpret_cast<const char8_t*>(filename.c_str());
 
         // ファイルをバイナリモードで開く
         std::ofstream file(filePath, std::ios::binary);

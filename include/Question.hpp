@@ -29,16 +29,16 @@ public:
         : genreName_(genreName), genreDescription_(genreDescription), questions_(questions) {
     }
 
-    // ゲッター
-    std::string getGenreName() const { return genreName_; }
-    std::string getGenreDescription() const { return genreDescription_; }
-    std::vector<std::string> getQuestions() const { return questions_; }
-
-    std::string getQuestion(size_t index) const {
+    // getter（const参照返しでコピーを防止）
+    const std::string& getGenreName() const { return genreName_; }
+    const std::string& getGenreDescription() const { return genreDescription_; }
+    const std::vector<std::string>& getQuestions() const { return questions_; }
+    const std::string& getQuestion(size_t index) const {
+        static const std::string empty;
         if (index < questions_.size()) {
             return questions_[index];
         }
-        return "";
+        return empty;
     }
 
     size_t getQuestionCount() const { return questions_.size(); }
@@ -107,7 +107,7 @@ public:
             });
         if (allWhitespace) return false;
 
-        // UTF-8文字数カウント
+        // UTF-8文字数カウント（1〜50文字）
         size_t charCount = 0;
         for (size_t i = 0; i < str.length();) {
             unsigned char c = static_cast<unsigned char>(str[i]);
@@ -173,17 +173,19 @@ public:
         }
     }
 
-    // getter
-    std::string getDate() const { return date_; }
-    std::string getTitle() const { return title_; }
-    std::string getAuthor() const { return author_; }
+    // getter（const参照返し）
+    const std::string& getDate() const { return date_; }
+    const std::string& getTitle() const { return title_; }
+    const std::string& getAuthor() const { return author_; }
     int getGenreIndex() const { return genreIndex_; }
-    std::string getGenreName() const { return genreName_; }
-    std::vector<std::string> getAnswers() const { return answers_; }
-    std::string getAnswer(size_t index) const {
+    const std::string& getGenreName() const { return genreName_; }
+    const std::vector<std::string>& getAnswers() const { return answers_; }
+    const std::string& getAnswer(size_t index) const {
+        static const std::string empty;
         if (index < answers_.size()) return answers_[index];
-        return "";
+        return empty;
     }
 };
+
 
 #endif // QUESTION_HPP

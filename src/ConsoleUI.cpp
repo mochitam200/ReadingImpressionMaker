@@ -16,6 +16,7 @@ std::string ConsoleUI::inputDate() {
         if (ReadingRecord::isValidDate(line)) {
             return line;
         }
+        std::cout << "入力形式が正しくありません。例：260801, 2604, 26春, 不明\n> ";
     }
     return ""; // 入力エラー（ファイル末尾到達など）が発生した場合は空文字を返す
 }
@@ -77,14 +78,26 @@ int ConsoleUI::selectGenre(const std::vector<QuestionSet>& questions) {
             // 入力された番号が選択肢の範囲内（1 〜 質問セットの数）か確認
             if (choice >= 1 && choice <= static_cast<int>(questions.size())) {
                 // 配列のインデックス（0始まり）に合わせて -1 した値を返す
-                return choice - 1;
+                int selectedIdx = choice - 1;
+                // ジャンル確認プロンプト
+                std::cout << "「" << questions[selectedIdx].getGenreName() << "」でよろしいですか？ (y/n)\n> ";
+                std::string confirm;
+                if (std::getline(std::cin, confirm)) {
+                    if (confirm.empty() || confirm == "y" || confirm == "Y") {
+                        return selectedIdx;
+                    }
+                    // n 等の場合は再度ジャンル選択を促す
+                    std::cout << "\n番号を入力してください (1〜" << questions.size() << ")\n> ";
+                    continue;
+                }
+                return -1;
             }
         }
-        // 範囲外の数値や文字を入力された場合は警告を出して再入力
-        std::cout << "無効な入力です。1 〜 " << questions.size() << " の番号を入力してください。\n> ";
+        std::cout << "1〜" << questions.size() << "の番号で入力してください。\n> ";
     }
-    return -1; // エラー時は -1 を返す
+    return -1;
 }
+
 
 // 複数の質問に対する回答を順番に入力・収集する関数
 std::vector<std::string> ConsoleUI::askQuestions(const QuestionSet& questionSet) {
@@ -94,9 +107,13 @@ std::vector<std::string> ConsoleUI::askQuestions(const QuestionSet& questionSet)
     // 質問の数だけ順番に処理を繰り返す
     for (size_t i = 0; i < count; ++i) {
         // 画面に質問を表示する
-        std::cout << "\n----------------------------------------\n";
+        std::cout << "\n--------------------------------------------------\n";
         std::cout << " Q" << (i + 1) << ": " << questionSet.getQuestion(i) << "\n";
-        std::cout << "----------------------------------------\n> ";
+        std::cout << "--------------------------------------------------\n> ";
+        std::cout << questionSet.getQuestion(i) << "\n\n";
+        std::cout << "※ 改行したい場合は文末に \\ を入力してEnterで次の行へ\n";
+        std::cout << "※ 回答を終了するには空行でEnterを押してください\n";
+        std::cout << "※ この質問をスキップするには「skip」と入力してください(未入力でEnter入力でもスキップされます)\n\n> ";
 
         std::string line;
         std::string fullAnswer; // 複数行入力されたテキストをまとめる変数
@@ -106,13 +123,13 @@ std::vector<std::string> ConsoleUI::askQuestions(const QuestionSet& questionSet)
         // ユーザーの入力を1行ずつ受け取る（Enterを2回押すと入力終了）
         while (std::getline(std::cin, line)) {
             // 最初の行で "skip" と入力されたら質問を飛ばす
-            if (isFirstLine && line == "skip") {
+            if (isFirstLine && (line == "skip" || line.empty())) {
                 skipped = true;
                 break; // ループを抜ける
             }
 
             // 空白行（そのままEnterを押した）なら入力完了とみなしてループを抜ける
-            if (line.empty()) {
+            if (!isFirstLine && line.empty()) {
                 break;
             }
 

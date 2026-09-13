@@ -1,4 +1,4 @@
-﻿#include "../include/Question.hpp"       // QuestionSet, ReadingRecord クラスを使用
+#include "../include/Question.hpp"       // QuestionSet, ReadingRecord クラスを使用
 #include "../include/CsvLoader.hpp"      // CSV読み込み機能を使用
 #include "../include/ConsoleUI.hpp"      // コンソール入力機能を使用
 #include "../include/RecordExporter.hpp" // ファイル出力機能を使用
@@ -8,6 +8,11 @@
 #include <sstream>                    // 文字列ストリーム
 #include <clocale>                    // ロケール設定のため
 #include <algorithm>                  // all_of 等
+
+// Windows環境専用の機能を読み込む
+#ifdef _WIN32
+#include <windows.h> // コンソールの文字コード設定（SetConsoleCP等）を使うため
+#endif
 
 // 補助関数: 文字列の各行にインデントを付加して表示
 static void printFormattedAnswer(const std::string& answer) {
@@ -76,13 +81,20 @@ static void displayConfirmation(const ReadingRecord& record, const QuestionSet& 
 }
 
 int main()
-{
-    // 日本語の入出力を正しく扱うためにロケールを設定
-    std::setlocale(LC_ALL, ".UTF-8");
+{   
+        //Windowsコンソールの文字コードをUTF-8（コードページ65001）に設定する
+        // これにより、全角文字をキーボード入力した際にもUTF-8として正しく受け取れるようになる
+#ifdef _WIN32
+        SetConsoleCP(CP_UTF8);       // コンソールからの入力（std::cin）をUTF-8に設定
+        SetConsoleOutputCP(CP_UTF8); // コンソールへの出力（std::cout）をUTF-8に設定
+#endif
 
-    // ── 1. CSVファイルから質問一覧を読み込み ──
-    const std::string csvFilename = "book_review_questions.csv";
-    std::vector<QuestionSet> questionSets = CsvLoader::load(csvFilename);
+        // 日本語の入出力を正しく扱うためにCランタイムのロケールをUTF-8に設定
+        std::setlocale(LC_ALL, ".UTF-8");
+
+        // ── 1. CSVファイルから質問一覧を読み込み ──
+        const std::string csvFilename = "book_review_questions.csv";
+        std::vector<QuestionSet> questionSets = CsvLoader::load(csvFilename);
 
     if (questionSets.empty()) { // CSVの読み込みに失敗した場合
         std::cerr << "[エラー] " << csvFilename << " が見つかりません。\n";
