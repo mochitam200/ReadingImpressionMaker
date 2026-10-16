@@ -143,15 +143,22 @@
   <ItemGroup>
     <ClCompile Include="src\RecordExporter.cpp" />
     <ClCompile Include="src\CsvLoader.cpp" />
-    <ClCompile Include="src\main.cpp" />
+    <ClCompile Include="tests\TestConsoleUI.cpp" />
+    <ClCompile Include="tests\TestCsvLoader.cpp" />
     <ClCompile Include="tests\TestData\TestConsoleUI.cpp" />
     <ClCompile Include="tests\TestData\TestCsvLoader.cpp" />
+    <ClCompile Include="tests\TestData\TestMain.cpp" />
     <ClCompile Include="tests\TestData\TestQuestion.cpp" />
     <ClCompile Include="tests\TestData\TestRecordExporter.cpp" />
     <ClCompile Include="src\ConsoleUI.cpp" />
+    <ClCompile Include="tests\TestQuestion.cpp" />
+    <ClCompile Include="tests\TestRecordExporter.cpp" />
+    <ClCompile Include="tests\test_main.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="book_review_questions.csv" />
+    <None Include="packages.config" />
+    <None Include="tests\book_review_questions.csv" />
     <None Include="tests\TestData\book_review_questions.csv" />
   </ItemGroup>
   <ItemGroup>
@@ -162,5 +169,14 @@
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
+    <Import Project="packages\googletest.redist.1.8.3\build\native\googletest.redist.targets" Condition="Exists('packages\googletest.redist.1.8.3\build\native\googletest.redist.targets')" />
+    <Import Project="packages\googletest.1.8.3\build\native\googletest.targets" Condition="Exists('packages\googletest.1.8.3\build\native\googletest.targets')" />
   </ImportGroup>
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>このプロジェクトは、このコンピューター上にない NuGet パッケージを参照しています。それらのパッケージをダウンロードするには、[NuGet パッケージの復元] を使用します。詳細については、http://go.microsoft.com/fwlink/?LinkID=322105 を参照してください。見つからないファイルは {0} です。</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('packages\googletest.redist.1.8.3\build\native\googletest.redist.targets')" Text="$([System.String]::Format('$(ErrorText)', 'packages\googletest.redist.1.8.3\build\native\googletest.redist.targets'))" />
+    <Error Condition="!Exists('packages\googletest.1.8.3\build\native\googletest.targets')" Text="$([System.String]::Format('$(ErrorText)', 'packages\googletest.1.8.3\build\native\googletest.targets'))" />
+  </Target>
 </Project>

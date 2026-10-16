@@ -15,6 +15,9 @@ std::string ConsoleUI::inputDate() {
         // 日付の形式が正しいかチェックし、OKならそのまま返す
         if (ReadingRecord::isValidDate(line)) {
             return line;
+        } else {
+            // エラーメッセージ
+            std::cout << "入力形式が正しくありません。例：260801, 2604, 26春, 不明\n> ";
         }
     }
     return ""; // 入力エラー（ファイル末尾到達など）が発生した場合は空文字を返す
@@ -38,6 +41,10 @@ std::string ConsoleUI::inputTitle() {
         // 文字列の長さが規定範囲内であれば入力採用
         if (ReadingRecord::isValidStringLength(line)) {
             return line;
+        }
+        else {
+            // タイトル・著者名が51文字以上のときのエラーメッセージ
+            std::cout << "50文字以内で入力してください。\n> ";
         }
     }
     return "";
@@ -79,6 +86,8 @@ int ConsoleUI::selectGenre(const std::vector<QuestionSet>& questions) {
                 // 配列のインデックス（0始まり）に合わせて -1 した値を返す
                 return choice - 1;
             }
+            // "n" またはそれ以外 → 再選択
+            continue;
         }
         // 範囲外の数値や文字を入力された場合は警告を出して再入力
         std::cout << "無効な入力です。1 〜 " << questions.size() << " の番号を入力してください。\n> ";

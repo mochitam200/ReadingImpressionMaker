@@ -30,6 +30,9 @@ cmake_install.cmake
 Makefile
 compile_commands.json
 
+packages/
+ReadingI.0a5a8157/
+
 # 一時ファイル・ログ
 *.log
 *.tmp

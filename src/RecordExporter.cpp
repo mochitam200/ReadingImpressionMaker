@@ -29,7 +29,7 @@ std::string RecordExporter::sanitizeFilename(const std::string& name) {
 bool RecordExporter::exportToFile(const ReadingRecord& record, const std::vector<QuestionSet>& questions) {
     try {
         // 日本語などの文字化けを防ぐため、文字コードをUTF-8に設定
-        std::setlocale(LC_ALL, ".UTF-8");
+        // std::setlocale(LC_ALL, ".UTF-8");
 
         // 「output」フォルダが存在しない場合は自動で作成する
         if (!fs::exists("output")) {
@@ -42,7 +42,8 @@ bool RecordExporter::exportToFile(const ReadingRecord& record, const std::vector
         std::string authorStr = sanitizeFilename(record.getAuthor());
 
         // 保存先となるファイルパスを作成（例: output/2026-03-05_タイトル_著者.txt）
-        fs::path filePath = fs::path("output") / (dateStr + "_" + titleStr + "_" + authorStr + ".txt");
+        // UTF-8 文字列のパスを fs::u8path() で正しく扱う
+        fs::path filePath = fs::u8path("output") / fs::u8path(dateStr + "_" + titleStr + "_" + authorStr + ".txt");
 
         // ファイルをバイナリモードで開く
         std::ofstream file(filePath, std::ios::binary);

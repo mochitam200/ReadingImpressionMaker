@@ -1,31 +1,19 @@
-﻿#include "../../include/CsvLoader.hpp" // テスト対象のCsvLoaderを使うために読み込みます。
-#include <cstdio> // テスト用CSVファイルを削除するstd::removeを使います。
-#include <fstream> // テスト用CSVファイルを作成するために使います。
-#include <iostream> // テスト結果を表示するために使います。
-#include <string> // ファイル名などの文字列を扱うために使います。
+﻿#include "../include/CsvLoader.hpp"
+#include <gtest/gtest.h>
+#include <cstdio>
+#include <fstream>
+#include <string>
 
-namespace // このファイルだけで使う補助関数を名前空間で囲みます。
-{ // 無名名前空間の開始です。
+namespace
+{
+    void writeTextFile(const std::string& filename, const std::string& text)
+    {
+        std::ofstream file(filename, std::ios::binary);
+        file << text;
+    }
 
-    bool check(bool condition, const std::string& name) // テスト結果を共通表示する関数です。
-    { // check関数の開始です。
-        if (condition) // 期待した結果になったか確認します。
-        { // 成功時の処理を開始します。
-            std::cout << "[PASS] " << name << '\n'; // 成功したテスト名を表示します。
-            return true; // 成功を返します。
-        } // 成功時の処理を終了します。
-        std::cout << "[FAIL] " << name << '\n'; // 失敗したテスト名を表示します。
-        return false; // 失敗を返します。
-    } // check関数の終了です。
-
-    void writeTextFile(const std::string& filename, const std::string& text) // 指定した文字列をテストファイルへ書き込む関数です。
-    { // 関数開始です。
-        std::ofstream file(filename, std::ios::binary); // バイナリモードでテストファイルを開きます。
-        file << text; // 引数で受け取ったテキストを書き込みます。
-    } // 関数終了です。
-
-    std::string makeValidCsv(const std::string& newline = "\n") // 5列・30行の仕様に適合するCSV文字列を作ります。
-    { // 関数開始です。
+    std::string makeValidCsv(const std::string& newline = "\n")
+    {
         std::string csv;
         csv += "1,小説・物語,ストーリーや登場人物の心情を楽しむ本,1,一言で紹介するならどんな本ですか" + newline;
         csv += "1,小説・物語,ストーリーや登場人物の心情を楽しむ本,2,一番印象に残った登場人物は誰？（好き・嫌い・気になった理由も）" + newline;
@@ -62,71 +50,61 @@ namespace // このファイルだけで使う補助関数を名前空間で囲�
         csv += "5,ノンフィクション・伝記,事実に基づいた記録や人物の生涯を描いた本,5,著者の情熱や生き方から、自分の人生に「感染」させたいエネルギーや姿勢は？" + newline;
         csv += "5,ノンフィクション・伝記,事実に基づいた記録や人物の生涯を描いた本,6,最後に何かあればご自由にお書きください" + newline;
         return csv;
-    } // 関数終了です。
+    }
+} // namespace
 
-} // 無名名前空間の終了です。
-
-// TC-C-01: LF改行ファイルの読み込み
-bool testCsvValidLF()
+TEST(CsvLoaderTest, TC_C_01_ValidLF)
 {
     const std::string filename = "test_valid_lf.csv";
     writeTextFile(filename, makeValidCsv("\n"));
     const auto result = CsvLoader::load(filename);
     std::remove(filename.c_str());
-    return check(result.size() == 5 &&
-        result[0].getGenreName() == "小説・物語" &&
-        result[0].getGenreDescription() == "ストーリーや登場人物の心情を楽しむ本" &&
-        result[0].getQuestionCount() == 6 &&
-        result[4].getQuestionCount() == 6,
-        "TC-C-01: CsvLoader valid CSV LF");
+    ASSERT_EQ(result.size(), 5u);
+    EXPECT_EQ(result[0].getGenreName(), "小説・物語");
+    EXPECT_EQ(result[0].getGenreDescription(), "ストーリーや登場人物の心情を楽しむ本");
+    EXPECT_EQ(result[0].getQuestionCount(), 6);
+    EXPECT_EQ(result[4].getQuestionCount(), 6);
 }
 
-// TC-C-02: CRLF改行ファイルの読み込み
-bool testCsvValidCRLF()
+TEST(CsvLoaderTest, TC_C_02_ValidCRLF)
 {
     const std::string filename = "test_valid_crlf.csv";
     writeTextFile(filename, makeValidCsv("\r\n"));
     const auto result = CsvLoader::load(filename);
     std::remove(filename.c_str());
-    return check(result.size() == 5 &&
-        result[0].getQuestionCount() == 6 &&
-        result[4].getQuestionCount() == 6,
-        "TC-C-02: CsvLoader valid CSV CRLF");
+    ASSERT_EQ(result.size(), 5u);
+    EXPECT_EQ(result[0].getQuestionCount(), 6);
+    EXPECT_EQ(result[4].getQuestionCount(), 6);
 }
 
-// TC-C-03: UTF-8 BOM付きファイルの読み込み
-bool testCsvValidBom()
+TEST(CsvLoaderTest, TC_C_03_ValidBOM)
 {
     const std::string filename = "test_valid_bom.csv";
     writeTextFile(filename, std::string("\xEF\xBB\xBF") + makeValidCsv());
     const auto result = CsvLoader::load(filename);
     std::remove(filename.c_str());
-    return check(result.size() == 5 &&
-        result[0].getGenreName() == "小説・物語" &&
-        result[0].getGenreDescription() == "ストーリーや登場人物の心情を楽しむ本",
-        "TC-C-03: CsvLoader UTF-8 BOM");
+    ASSERT_EQ(result.size(), 5u);
+    EXPECT_EQ(result[0].getGenreName(), "小説・物語");
+    EXPECT_EQ(result[0].getGenreDescription(), "ストーリーや登場人物の心情を楽しむ本");
 }
 
-// TC-C-04: 存在しないファイル読み込み
-bool testCsvFileNotFound()
+TEST(CsvLoaderTest, TC_C_04_FileNotFound)
 {
     std::remove("test_not_found.csv");
     const auto result = CsvLoader::load("test_not_found.csv");
-    return check(result.empty(), "TC-C-04: CsvLoader file not found");
+    EXPECT_TRUE(result.empty());
 }
 
-// TC-C-05: 空ファイルの読み込み
-bool testCsvEmpty()
+TEST(CsvLoaderTest, TC_C_05_EmptyCsv)
 {
     const std::string filename = "test_empty.csv";
     writeTextFile(filename, "");
     const auto result = CsvLoader::load(filename);
     std::remove(filename.c_str());
-    return check(result.empty(), "TC-C-05: CsvLoader empty CSV");
+    EXPECT_TRUE(result.empty());
 }
 
-// TC-C-06: 規定行数未満 (29行) の読み込み
-bool testCsvLessThan30Rows()
+TEST(CsvLoaderTest, TC_C_06_LessThan30Rows)
 {
     const std::string filename = "test_29_rows.csv";
     std::string csv;
@@ -137,64 +115,41 @@ bool testCsvLessThan30Rows()
     writeTextFile(filename, csv);
     const auto result = CsvLoader::load(filename);
     std::remove(filename.c_str());
-    return check(result.empty(), "TC-C-06: CsvLoader less than 30 rows");
+    EXPECT_TRUE(result.empty());
 }
 
-// TC-C-07: 列数不足 (4列以下) の読み込み
-bool testCsvTooFewColumns()
+TEST(CsvLoaderTest, TC_C_07_TooFewColumns)
 {
     const std::string filename = "test_few_columns.csv";
-    // 5列必要なのに対し4列以下の行を含むCSV
     writeTextFile(filename, "1,小説・物語,ストーリーや登場人物の心情を楽しむ本,1\n");
     const auto result = CsvLoader::load(filename);
     std::remove(filename.c_str());
-    return check(result.empty(), "TC-C-07: CsvLoader too few columns (<=4)");
+    EXPECT_TRUE(result.empty());
 }
 
-// TC-C-08: 列数超過 (6列以上) の読み込み
-bool testCsvTooManyColumns()
+TEST(CsvLoaderTest, TC_C_08_TooManyColumns)
 {
     const std::string filename = "test_many_columns.csv";
-    // 5列必要なのに対し6列ある行を含むCSV
     writeTextFile(filename, "1,小説・物語,ストーリーや登場人物の心情を楽しむ本,1,質問文,余分な列\n");
     const auto result = CsvLoader::load(filename);
     std::remove(filename.c_str());
-    return check(result.empty(), "TC-C-08: CsvLoader too many columns (>=6)");
+    EXPECT_TRUE(result.empty());
 }
 
-// TC-C-09: ジャンル番号の数値不正
-bool testCsvInvalidGenreNumber()
+TEST(CsvLoaderTest, TC_C_09_InvalidGenreNumber)
 {
     const std::string filename = "test_invalid_genre.csv";
     writeTextFile(filename, "A,小説・物語,ストーリーや登場人物の心情を楽しむ本,1,質問文\n");
     const auto result = CsvLoader::load(filename);
     std::remove(filename.c_str());
-    return check(result.empty(), "TC-C-09: CsvLoader invalid genre number");
+    EXPECT_TRUE(result.empty());
 }
 
-// TC-C-10: 質問番号の数値不正
-bool testCsvInvalidQuestionNumber()
+TEST(CsvLoaderTest, TC_C_10_InvalidQuestionNumber)
 {
     const std::string filename = "test_invalid_question.csv";
     writeTextFile(filename, "1,小説・物語,ストーリーや登場人物の心情を楽しむ本,A,質問文\n");
     const auto result = CsvLoader::load(filename);
     std::remove(filename.c_str());
-    return check(result.empty(), "TC-C-10: CsvLoader invalid question number");
-}
-
-int runCsvLoaderTests()
-{
-    int failed = 0;
-    std::cout << "\n--- CsvLoader tests ---\n";
-    failed += !testCsvValidLF();
-    failed += !testCsvValidCRLF();
-    failed += !testCsvValidBom();
-    failed += !testCsvFileNotFound();
-    failed += !testCsvEmpty();
-    failed += !testCsvLessThan30Rows();
-    failed += !testCsvTooFewColumns();
-    failed += !testCsvTooManyColumns();
-    failed += !testCsvInvalidGenreNumber();
-    failed += !testCsvInvalidQuestionNumber();
-    return failed;
+    EXPECT_TRUE(result.empty());
 }
