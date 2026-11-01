@@ -42,4 +42,5 @@ target_link_libraries(
 )
 
 # テストを登録
-add_test(NAME AllTests COMMAND ReadingImpressionMakerTests)
+add_test(NAME AllTests COMMAND ReadingImpressionMakerTests
+    WORKING_DIRECTORY ${CMAKE_BINARY_DIR})

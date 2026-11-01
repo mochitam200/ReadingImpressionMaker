@@ -76,21 +76,21 @@ public:
         if (d.empty()) return false;
         if (d == "不明") return true;
 
-        // パターン1: YYMMDD 形式（数字6桁）
-        if (d.length() == 6 && std::all_of(d.begin(), d.end(), ::isdigit)) {
+        // パターン1: YYMMDD 形式（数字6桁）、unsigned char にキャストして安全化
+        if (d.length() == 6 && std::all_of(d.begin(), d.end(), [](unsigned char c) { return std::isdigit(c); })) {
             int month = std::stoi(d.substr(2, 2));
             int day = std::stoi(d.substr(4, 2));
             return (month >= 1 && month <= 12 && day >= 1 && day <= 31);
         }
 
-        // パターン2: YYMM 形式（数字4桁）
-        if (d.length() == 4 && std::all_of(d.begin(), d.end(), ::isdigit)) {
+        // パターン2: YYMM 形式（数字4桁）、unsigned char にキャストして安全化
+        if (d.length() == 4 && std::all_of(d.begin(), d.end(), [](unsigned char c) { return std::isdigit(c); })) {
             int month = std::stoi(d.substr(2, 2));
             return (month >= 1 && month <= 12);
         }
 
         // パターン3: YY+季節 形式（数字2桁 + 春/夏/秋/冬）
-        if (d.length() == 5 && std::isdigit(static_cast<unsigned char>(d[0])) && std::isdigit(static_cast<unsigned char>(d[1]))) {
+        if (d.length() >= 3 && std::isdigit(static_cast<unsigned char>(d[0])) && std::isdigit(static_cast<unsigned char>(d[1]))) {
             std::string season = d.substr(2);
             return (season == "春" || season == "夏" || season == "秋" || season == "冬");
         }
