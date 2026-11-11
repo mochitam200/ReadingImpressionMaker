@@ -8,6 +8,10 @@
 #include <sstream>                    // 文字列ストリーム
 #include <clocale>                    // ロケール設定のため
 #include <algorithm>                  // all_of 等
+#if defined(_WIN32) || defined(_WIN64)
+#include <windows.h>                  // コンソールのコードページ設定用
+#endif
+
 
 // 補助関数: 文字列の各行にインデントを付加して表示
 static void printFormattedAnswer(const std::string& answer) {
@@ -15,6 +19,8 @@ static void printFormattedAnswer(const std::string& answer) {
     std::string line;
     bool isFirst = true;
     while (std::getline(ss, line)) {
+
+
         if (isFirst) {
             std::cout << "    → " << line << "\n";
             isFirst = false;
@@ -48,7 +54,7 @@ static void displayGenreList(const std::vector<QuestionSet>& questionSets) {
         }
         std::cout << "\n";
     }
-    std::cout << "\n番号を入力してください (1〜" << questionSets.size() << ")\n> ";
+    std::cout << "\n番号を入力してください (1〜" << questionSets.size() << ")※半角数字\n> ";
 }
 
 // 補助関数: 最終確認画面の表示
@@ -77,6 +83,11 @@ static void displayConfirmation(const ReadingRecord& record, const QuestionSet& 
 
 int main()
 {
+#if defined(_WIN32) || defined(_WIN64)
+    // Windowsコンソールの入出力コードページをUTF-8に設定
+    SetConsoleCP(CP_UTF8);
+    SetConsoleOutputCP(CP_UTF8);
+#endif
     // 日本語の入出力を正しく扱うためにロケールを設定
     std::setlocale(LC_ALL, ".UTF-8");
 

@@ -41,8 +41,8 @@ bool RecordExporter::exportToFile(const ReadingRecord& record, const std::vector
         std::string titleStr = sanitizeFilename(record.getTitle());
         std::string authorStr = sanitizeFilename(record.getAuthor());
 
-        // 保存先となるファイルパスを作成（例: output/2026-03-05_タイトル_著者.txt）
-        fs::path filePath = fs::path("output") / (dateStr + "_" + titleStr + "_" + authorStr + ".txt");
+        // 保存先となるファイルパスを作成（UTF-8文字列として安全に解釈）
+        fs::path filePath = fs::path("output") / fs::u8path(dateStr + "_" + titleStr + "_" + authorStr + ".txt");
 
         // ファイルをバイナリモードで開く
         std::ofstream file(filePath, std::ios::binary);

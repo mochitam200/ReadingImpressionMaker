@@ -85,23 +85,28 @@ int ConsoleUI::selectGenre(const std::vector<QuestionSet>& questions) {
             int choice = std::stoi(line);
             // 入力された番号が選択肢の範囲内（1 〜 質問セットの数）か確認
             if (choice >= 1 && choice <= static_cast<int>(questions.size())) {
+                // 選択されたジャンル名の確認メッセージを表示
+                std::cout << "\n「" << questions[choice - 1].getGenreName() << "」でよろしいですか？ (y/n)※半角y/n\n> ";
+
                 // y/n で確認を求める
                 std::string confirm;
                 if (std::getline(std::cin, confirm)) {
-                    if (confirm == "y" || confirm == "Y") {
+                    // "y", "Y"、またはそのまま Enter（空文字）を押した場合は確定
+                    if (confirm == "y" || confirm == "Y" || confirm.empty()) {
                         // 配列のインデックス（0始まり）に合わせて -1 した値を返す
                         return choice - 1;
                     }
-                    // "n" またはそれ以外 → 再選択へ戻る
+                    // "n" またはキャンセル時：再入力プロンプトを表示して戻る
+                    std::cout << "\n番号を入力してください (1〜" << questions.size() << ")\n> ";
                     continue;
                 }
             }
             // 範囲外の数値を入力された場合は警告を出して再入力
-            std::cout << "無効な入力です。1 〜 " << questions.size() << " の番号を入力してください。\n> ";
+            std::cout << "無効な入力です。1 ~ " << questions.size() << " の番号を入力してください。\n> ";
             continue;
         }
         // 数字以外を入力された場合は警告を出して再入力
-        std::cout << "無効な入力です。1 〜 " << questions.size() << " の番号を入力してください。\n> ";
+        std::cout << "無効な入力です。1 ~ " << questions.size() << " の番号を入力してください。\n> ";
     }
     return -1; // エラー時は -1 を返す
 }
