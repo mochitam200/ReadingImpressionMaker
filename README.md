@@ -137,7 +137,7 @@ git clone https://github.com/mochitam200/ReadingImpressionMaker.git
 4. すべての質問に答えると、回答内容がファイルに出力・保存されます。
 
 ### 3. 質問の追加・編集方法
-質問データのCSVファイルをメモ帳や Excel 等で編集することで、質問内容を自由に追加・変更できます。
+* 質問データのCSVファイルをメモ帳や Excel 等で編集することで、質問内容を自由に追加・変更できます。
 ---
 
 ## 📜 ライセンス（License）
