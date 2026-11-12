@@ -10,6 +10,7 @@
 最初に本のジャンルを選択すると、そのジャンルに合った質問が順番に表示されます。質問に答えていくだけで、感想文の材料を自然に引き出せるように設計しています。
 
 ### 作成目的
+
 * 読書感想文の作成を、質問への回答という形でサポートすること
 * C++を用いたコンソールアプリケーション開発、ファイルI/O（CSVパース）、クラス設計の実践
 
@@ -18,9 +19,9 @@
 ## ✨ 主な機能（Features）
 
 - 📚 **ジャンル別質問出題**: 小説・物語／実用書／ビジネス・自己啓発／専門書・学習書／ノンフィクション・伝記の5ジャンルから選択し、ジャンルに合った質問を表示
-- 📂 **CSVデータ動的読み込み**: 質問データを外部CSVファイルから読み込み（`CsvLoader`）
+- 📂 **CSVデータ動的読み込み**: 質問データをプロジェクト直下の外部CSVファイル `book_review_questions.csv` から読み込み（`CsvLoader`）
 - 💬 **対話形式のコンソールUI**: 画面の案内に沿って入力していくだけのシンプルな操作（`ConsoleUI`）
-- 💾 **回答のエクスポート**: 入力した回答をレコードとしてファイルに出力し、あとから見返せるように保存（`RecordExporter`）
+- 💾 **回答のエクスポート**: 回答を終えた内容は `output` フォルダにファイルとして出力され、あとから見返せるように保存（`RecordExporter`）
 - ⚠️ **入力バリデーション**: ジャンル選択などで無効な入力に対するエラーハンドリングを実装
 - ✅ **単体テスト**: 主要コンポーネントにGoogle Testによる単体テストを用意
 
@@ -59,7 +60,6 @@
 
 ```text
 ReadingImpressionMaker/
-├── ReadingImpressionMaker.sln # ソリューションファイル
 ├── include/ # ヘッダーファイル (.hpp)
 │ ├── ConsoleUI.hpp # コンソール入出力・画面表示
 │ ├── Question.hpp # 質問データのモデル
@@ -78,8 +78,13 @@ ReadingImpressionMaker/
 │ ├── TestQuestion.cpp
 │ ├── TestCsvLoader.cpp
 │ └── TestRecordExporter.cpp
-├── README.md # このファイル
-└── LICENSE.txt # ライセンス
+├── docs/ # ドキュメント
+├── output/ # 回答を終えたファイルの出力先
+├── build/ , packages/ , x64/ # ビルド関連フォルダ
+├── book_review_questions.csv # 質問集 (プロジェクト直下)
+├── CMakeLists.txt
+├── LICENSE.txt # ライセンス
+└── README.md # このファイル
 ```
 
 ---
