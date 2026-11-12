@@ -50,14 +50,14 @@
 
 ## 🤝 開発パートナー
 * **AIパートナー**: Gemini,ChatGPT,Claude,Muse
-* コードレビュー、エラーの原因調査、ドキュメント生成のパートナーとして活用しました。
+ * コードの実装支援、コードレビュー、エラーの原因調査・修正方針の検討、ドキュメント生成のパートナーとして活用しました。
+ * 要件の決定、仕様の確認、ビルド・動作テスト、最終確認は開発者本人が行いました。
 
 ---
 
 ## 📁 フォルダ構成（Directory Structure）
 
 ```text
-ReadingImpressionMaker/
 ReadingImpressionMaker/
 ├── ReadingImpressionMaker.sln # ソリューションファイル
 ├── include/ # ヘッダーファイル (.hpp)
@@ -66,7 +66,7 @@ ReadingImpressionMaker/
 │ ├── CsvLoader.hpp # CSVファイルからの質問読み込み
 │ └── RecordExporter.hpp # 回答レコードのエクスポート
 ├── src/ # ソースファイル (.cpp)
-│ ├── Main.cpp # エントリーポイント
+│ ├── main.cpp # エントリーポイント
 │ ├── ConsoleUI.cpp
 │ ├── Question.cpp
 │ ├── CsvLoader.cpp
